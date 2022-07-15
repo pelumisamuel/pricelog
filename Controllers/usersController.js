@@ -11,7 +11,7 @@ import {
 const LogIn = asyncHandler(async (req, res) => {
   const { email, password } = req.body
 
-  let user = await pool.query('select * from customer where email=?', [email])
+  let user = await pool.query('select * from users where email=?', [email])
   user = user[0][0]
 
   if (user && (await matchPassword(password, user.password))) {
@@ -20,11 +20,11 @@ const LogIn = asyncHandler(async (req, res) => {
     //if passed login in
 
     res.json({
-      id: user.id,
+      id: user.idusers,
       name: user.name,
       email: user.email,
       isAdmin: user.admin,
-      token: generateToken(user.id),
+      token: generateToken(user.idusers),
     })
   } else {
     res.status(401).send('email or username is invalid')
