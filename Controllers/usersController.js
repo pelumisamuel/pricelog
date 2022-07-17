@@ -6,6 +6,7 @@ import {
   hashPassword,
   validateUsers,
 } from '../Utils/validate.js'
+import { getAllUsers, getOneUser } from '../Models/userModel.js'
 
 //LOGIN USER
 const LogIn = asyncHandler(async (req, res) => {
@@ -20,11 +21,15 @@ const LogIn = asyncHandler(async (req, res) => {
     //if passed login in
 
     res.json({
-      id: user.idusers,
-      name: user.name,
-      email: user.email,
-      isAdmin: user.admin,
-      token: generateToken(user.idusers),
+      status: 200,
+      message: 'Login is successful',
+      data: {
+        id: user.idusers,
+        name: user.name,
+        email: user.email,
+        isAdmin: user.admin,
+        token: generateToken(user.idusers),
+      },
     })
   } else {
     res.status(401).send('email or username is invalid')
@@ -38,12 +43,11 @@ const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body
   try {
     const harshedPassword = await hashPassword(password)
-    const userExist = await pool.query(
-      'select email from users where email=?',
-      [email]
-    )
+    const userExist = await pool.query(getOneUser(email))
     if (userExist[0].length > 0) {
-      res.status(400).send('User already exist')
+      res
+        .status(400)
+        .send({ status: 400, message: 'User already exist', data: {} })
     } else {
       const result = await pool.query(
         'INSERT into users SET name=?, email=?, password=?',
@@ -52,15 +56,21 @@ const registerUser = asyncHandler(async (req, res) => {
       console.log(result)
 
       res.send({
-        name,
-        email,
-        id: result[0].insertId,
-        token: generateToken(result[0].insertId),
+        status: 201,
+        message: 'Registration is successful',
+        data: {
+          name,
+          email,
+          id: result[0].insertId,
+          token: generateToken(result[0].insertId),
+        },
       })
     }
   } catch (error) {
     console.log(error)
-    res.status(500).send(error)
+    res
+      .status(500)
+      .send({ status: 500, message: 'An error occur', data: error })
   }
 })
 
@@ -68,12 +78,12 @@ const registerUser = asyncHandler(async (req, res) => {
 
 const getUsers = asyncHandler(async (req, res) => {
   try {
-    const allUsers = await pool.query('SELECT * FROM users')
+    const allUsers = await pool.query(getAllUsers())
     // console.log(req)
 
     res.status(200).json(allUsers[0])
   } catch (error) {
-    throw new Error()
+    throw new Error(error)
   }
 })
 export { LogIn, registerUser, getUsers }

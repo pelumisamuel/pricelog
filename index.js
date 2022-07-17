@@ -1,7 +1,6 @@
 import express from 'express'
 
 import cors from 'cors'
-//import movieRoutes from './Routes/movieRoutes.js'
 import userRoutes from './Routes/userRoutes.js'
 import { errorHandler, notFound } from './middlewares/errorMiddlewares.js'
 

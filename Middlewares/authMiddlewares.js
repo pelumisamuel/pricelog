@@ -15,14 +15,14 @@ const protect = asyncHandler(async (req, res, next) => {
   //     res.status(401)
   //     throw new Error('Not authorized, no token')
   //   }
-  console.log(token)
 
-  token = req.headers.authorization.split(' ')[1]
-  console.log(token)
+  // if (token) token = req.headers.authorization.split(' ')[1]
+  if (req.headers.authorization) token = req.headers.authorization.split(' ')[1]
+  // console.log(token)
 
   if (!token) {
     res.status(401)
-    throw new Error('Not authorized, no token')
+    throw new Error('Not authorized, you have no access token')
   }
   if (
     req.headers.authorization &&
@@ -30,7 +30,6 @@ const protect = asyncHandler(async (req, res, next) => {
   ) {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET)
-      console.log(decoded.id)
 
       let user = await pool.query('select * from users where idusers=?', [
         decoded.id,
