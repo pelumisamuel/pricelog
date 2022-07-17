@@ -1,10 +1,20 @@
+// import pool from '../config/db'
+import pool from '../config/db.js'
+
 const getAllUsers = () => {
-  return 'SELECT * FROM users'
+  return pool.query('SELECT * FROM users')
 }
-const getOneUser = () => {
-  return 'select * from users where email=?'
+const getOneUser = (email) => {
+  return pool.query('select * from users where email=?', [email])
 }
-const getOneUserEmail = () => {
-  return 'select email from users where email=?'
+const getOneUserEmail = (email) => {
+  return pool.query('select email from users where email=?', [email])
 }
-export { getAllUsers, getOneUser, getOneUserEmail }
+const addOneUser = (name, email, harshedPassword) => {
+  return pool.query('INSERT into users SET name=?, email=?, password=?', [
+    name,
+    email,
+    harshedPassword,
+  ])
+}
+export { getAllUsers, getOneUser, getOneUserEmail, addOneUser }

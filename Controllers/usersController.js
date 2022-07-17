@@ -7,6 +7,7 @@ import {
   validateUsers,
 } from '../Utils/validate.js'
 import {
+  addOneUser,
   getAllUsers,
   getOneUser,
   getOneUserEmail,
@@ -16,7 +17,7 @@ import {
 const LogIn = asyncHandler(async (req, res) => {
   const { email, password } = req.body
 
-  let user = await pool.query(getOneUser(), [email])
+  let user = await getOneUser(email)
   user = user[0][0]
 
   if (user && (await matchPassword(password, user.password))) {
@@ -47,17 +48,12 @@ const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body
   try {
     const harshedPassword = await hashPassword(password)
-    const userExist = await pool.query(getOneUserEmail(), [email])
+    const userExist = await getOneUserEmail(email)
     if (userExist[0].length > 0) {
-      res
-        .status(400)
-        .send({ status: 400, message: 'User already exist', data: {} })
+      res.status(400).send({ status: 400, message: 'User already exist' })
     } else {
-      const result = await pool.query(
-        'INSERT into users SET name=?, email=?, password=?',
-        [name, email, harshedPassword]
-      )
-      console.log(result)
+      const result = await addOneUser(name, email, harshedPassword)
+      //console.log(result)
 
       res.send({
         status: 201,
@@ -82,7 +78,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
 const getUsers = asyncHandler(async (req, res) => {
   try {
-    const allUsers = await pool.query(getAllUsers())
+    const allUsers = await getAllUsers()
     // console.log(req)
 
     res.status(200).json(allUsers[0])
