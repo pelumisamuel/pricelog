@@ -1,7 +1,10 @@
 const getAllUsers = () => {
   return 'SELECT * FROM users'
 }
-const getOneUser = (email) => {
-  return 'select email from users where email=?', [email]
+const getOneUser = () => {
+  return 'select * from users where email=?'
 }
-export { getAllUsers, getOneUser }
+const getOneUserEmail = () => {
+  return 'select email from users where email=?'
+}
+export { getAllUsers, getOneUser, getOneUserEmail }

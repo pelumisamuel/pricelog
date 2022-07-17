@@ -6,13 +6,17 @@ import {
   hashPassword,
   validateUsers,
 } from '../Utils/validate.js'
-import { getAllUsers, getOneUser } from '../Models/userModel.js'
+import {
+  getAllUsers,
+  getOneUser,
+  getOneUserEmail,
+} from '../Models/userModel.js'
 
 //LOGIN USER
 const LogIn = asyncHandler(async (req, res) => {
   const { email, password } = req.body
 
-  let user = await pool.query('select * from users where email=?', [email])
+  let user = await pool.query(getOneUser(), [email])
   user = user[0][0]
 
   if (user && (await matchPassword(password, user.password))) {
@@ -43,7 +47,7 @@ const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body
   try {
     const harshedPassword = await hashPassword(password)
-    const userExist = await pool.query(getOneUser(email))
+    const userExist = await pool.query(getOneUserEmail(), [email])
     if (userExist[0].length > 0) {
       res
         .status(400)
@@ -83,7 +87,7 @@ const getUsers = asyncHandler(async (req, res) => {
 
     res.status(200).json(allUsers[0])
   } catch (error) {
-    throw new Error(error)
+    throw new Error()
   }
 })
 export { LogIn, registerUser, getUsers }
