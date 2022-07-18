@@ -1,6 +1,6 @@
 import asyncHandler from 'express-async-handler'
 import generateToken from '../Utils/generateToken.js'
-import pool from '../config/db.js'
+
 import {
   matchPassword,
   hashPassword,

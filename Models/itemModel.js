@@ -10,10 +10,10 @@ const getAllItems = () => {
 
 const getOneItem = (itemId) => {
   try {
-    return pool.query('SELECT * FROM items WHERE id=?', [itemId])
+    return pool.query('SELECT * FROM items WHERE itemsId=?', [itemId])
   } catch (error) {
     throw new Error()
   }
 }
 
-return { getAllItems, getOneItem }
+export { getAllItems, getOneItem }
