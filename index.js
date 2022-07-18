@@ -11,6 +11,7 @@ app.use(express.json())
 app.use(cors())
 
 //used Routes
+//USER
 app.use('/api/users', userRoutes)
 
 //Error middilewares
