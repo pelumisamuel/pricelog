@@ -17,7 +17,7 @@ router.post('/login', LogIn)
 router.put('/verify/:id', protect, admin, verifyUser)
 router.put('/disable/:id', protect, admin, disableUser)
 
-router.get('/profile', protect, verified, getUserProfile)
+router.get('/profile', protect, verified, getUserProfile).put(protect, verified)
 
 router.post('/register', registerUser)
 router.get('/', protect, verified, admin, getUsers)

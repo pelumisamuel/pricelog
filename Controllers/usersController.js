@@ -105,6 +105,8 @@ const getUserProfile = asyncHandler(async (req, res) => {
   //console.log(req.user.email)
 })
 
+//ADMIN FUNCTION
+
 //GET ALL USERS FROM ADMIN
 
 const getUsers = asyncHandler(async (req, res) => {
@@ -117,6 +119,10 @@ const getUsers = asyncHandler(async (req, res) => {
     throw new Error()
   }
 })
+
+//ADMIN--VERIFY A USER
+// 1. From route put api/users/verify/:id
+// 2. Access = Private/Admin
 const verifyUser = asyncHandler(async (req, res) => {
   try {
     let user = await pool.query('SELECT * FROM users WHERE idusers=?', [
@@ -129,7 +135,6 @@ const verifyUser = asyncHandler(async (req, res) => {
       return
     }
     req.user = user[0][0]
-    console.log(req.user.idusers)
 
     await pool.query('UPDATE users SET isVerified=? WHERE idusers=?', [
       true,
@@ -142,6 +147,9 @@ const verifyUser = asyncHandler(async (req, res) => {
   }
 })
 
+//ADMIN--DISABLE A USER
+// 1. From route put api/users/disable/:id
+// 2. Access = Private/Admin
 const disableUser = asyncHandler(async (req, res) => {
   try {
     let user = await pool.query('SELECT * FROM users WHERE idusers=?', [
@@ -154,7 +162,6 @@ const disableUser = asyncHandler(async (req, res) => {
       return
     }
     req.user = user[0][0]
-    console.log(req.user.idusers)
 
     await pool.query('UPDATE users SET isDisabled=? WHERE idusers=?', [
       true,
@@ -166,6 +173,41 @@ const disableUser = asyncHandler(async (req, res) => {
     throw new Error()
   }
 })
+//ADMIN--UPGRADE USER TO ADMIN
+// 1. From route put api/users/:id
+// 2. Access = Private/Admin
+
+const upgradeUser = asyncHandler(async (req, res) => {
+  try {
+    let user = await pool.query('SELECT * FROM users WHERE idusers=?', [
+      req.params.id,
+    ])
+    if (user[0].length === 0) {
+      res
+        .status(404)
+        .json({ status: 404, message: 'Invalid  User Id, User is not found' })
+      return
+    }
+
+    req.user = user[0][0]
+    console.log(req.user.idusers)
+    if (!req.user.isVerified) {
+      res
+        .status(406)
+        .send({ status: 406, message: 'Please verify the user first' })
+    }
+    await pool.query('UPDATE users SET isAdmin=? WHERE idusers=?', [
+      true,
+      req.user.idusers,
+    ])
+
+    res
+      .status(200)
+      .json({ status: 200, message: 'User has been Upgraded to Admin' })
+  } catch (error) {
+    throw new Error()
+  }
+})
 export {
   LogIn,
   registerUser,
@@ -173,4 +215,5 @@ export {
   verifyUser,
   getUserProfile,
   disableUser,
+  upgradeUser,
 }
