@@ -23,21 +23,21 @@ const LogIn = asyncHandler(async (req, res) => {
   user = user[0][0]
 
   if (user && (await matchPassword(password, user.password))) {
-    // if (!user.isVerified) {
-    //   res.status(401).send({
-    //     status: 401,
-    //     message: 'Not Authorized, You Have Not Been Verified',
-    //   })
+    if (!user.isVerified && !user.isAdmin) {
+      res.status(401).send({
+        status: 401,
+        message: 'Not Authorized, You Have Not Been Verified',
+      })
 
-    //   return
-    // }
-    // if (user.isDisabled) {
-    //   res.status(401).send({
-    //     status: 401,
-    //     message: 'Not Authorized, Your Account Has Been Disabled',
-    //   })
-    //   return
-    // }
+      return
+    }
+    if (user.isDisabled) {
+      res.status(401).send({
+        status: 401,
+        message: 'Not Authorized, Your Account Has Been Disabled',
+      })
+      return
+    }
 
     res.status(200)
 
