@@ -7,6 +7,9 @@ const getAllUsers = () => {
 const getOneUser = (email) => {
   return pool.query('select * from users where email=?', [email])
 }
+const getOneUserById = (id) => {
+  return pool.query('SELECT * FROM users WHERE id=?', [id])
+}
 const getOneUserEmail = (email) => {
   return pool.query('select email from users where email=?', [email])
 }
@@ -17,4 +20,4 @@ const addOneUser = (name, email, harshedPassword) => {
     harshedPassword,
   ])
 }
-export { getAllUsers, getOneUser, getOneUserEmail, addOneUser }
+export { getAllUsers, getOneUser, getOneUserEmail, addOneUser, getOneUserById }

@@ -10,8 +10,10 @@ import {
   addOneUser,
   getAllUsers,
   getOneUser,
+  getOneUserById,
   getOneUserEmail,
 } from '../Models/userModel.js'
+import pool from '../config/db.js'
 
 //LOGIN USER
 const LogIn = asyncHandler(async (req, res) => {
@@ -74,6 +76,18 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 })
 
+const getUserProfile = asyncHandler(async (req, res) => {
+  try {
+    res.send({
+      idusers: req.user.idusers,
+      name: req.user.name,
+      email: req.user.email,
+    })
+  } catch (error) {
+    throw new Error('profile not found')
+  }
+  //console.log(req.user.email)
+})
 //GET ALL USERS FROM ADMIN
 
 const getUsers = asyncHandler(async (req, res) => {
@@ -86,4 +100,29 @@ const getUsers = asyncHandler(async (req, res) => {
     throw new Error()
   }
 })
-export { LogIn, registerUser, getUsers }
+const verifyUser = asyncHandler(async (req, res) => {
+  try {
+    let user = await pool.query('SELECT * FROM users WHERE idusers=?', [
+      req.params.id,
+    ])
+    if (user[0].length === 0) {
+      res
+        .status(404)
+        .json({ status: 404, message: 'Invalid Id, Item not found' })
+      return
+    }
+    req.user = user[0][0]
+    console.log(req.user.idusers)
+
+    // const verifiedUser = await pool.query(
+    //   'UPDATE users SET isVerified=1 WHERE idusers =?)',
+    //   [req.user.idusers]
+    // )
+    // console.log(verifiedUser)
+
+    // res.status(200).json(item[0][0])
+  } catch (error) {
+    throw new Error()
+  }
+})
+export { LogIn, registerUser, getUsers, verifyUser, getUserProfile }

@@ -12,8 +12,8 @@ const importData = async () => {
         'INSERT into items SET name=?, priceId=?, category=?, description=?, vendorName=?, vendorAddr=?, image=?, manufacturerId=?, created=?',
         [
           x.name,
-          x.category,
           x.priceId,
+          x.category,
           x.description,
           x.vendorName,
           x.vendorAddr,
