@@ -23,6 +23,22 @@ const LogIn = asyncHandler(async (req, res) => {
   user = user[0][0]
 
   if (user && (await matchPassword(password, user.password))) {
+    // if (!user.isVerified) {
+    //   res.status(401).send({
+    //     status: 401,
+    //     message: 'Not Authorized, You Have Not Been Verified',
+    //   })
+
+    //   return
+    // }
+    // if (user.isDisabled) {
+    //   res.status(401).send({
+    //     status: 401,
+    //     message: 'Not Authorized, Your Account Has Been Disabled',
+    //   })
+    //   return
+    // }
+
     res.status(200)
 
     //if passed login in
@@ -88,6 +104,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
   }
   //console.log(req.user.email)
 })
+
 //GET ALL USERS FROM ADMIN
 
 const getUsers = asyncHandler(async (req, res) => {
@@ -108,21 +125,52 @@ const verifyUser = asyncHandler(async (req, res) => {
     if (user[0].length === 0) {
       res
         .status(404)
-        .json({ status: 404, message: 'Invalid Id, Item not found' })
+        .json({ status: 404, message: 'Invalid User Id, User is not found' })
       return
     }
     req.user = user[0][0]
     console.log(req.user.idusers)
 
-    // const verifiedUser = await pool.query(
-    //   'UPDATE users SET isVerified=1 WHERE idusers =?)',
-    //   [req.user.idusers]
-    // )
-    // console.log(verifiedUser)
+    await pool.query('UPDATE users SET isVerified=? WHERE idusers=?', [
+      true,
+      req.user.idusers,
+    ])
 
-    // res.status(200).json(item[0][0])
+    res.status(200).json({ status: 200, message: 'User has been verified' })
   } catch (error) {
     throw new Error()
   }
 })
-export { LogIn, registerUser, getUsers, verifyUser, getUserProfile }
+
+const disableUser = asyncHandler(async (req, res) => {
+  try {
+    let user = await pool.query('SELECT * FROM users WHERE idusers=?', [
+      req.params.id,
+    ])
+    if (user[0].length === 0) {
+      res
+        .status(404)
+        .json({ status: 404, message: 'Invalid  User Id, User is not found' })
+      return
+    }
+    req.user = user[0][0]
+    console.log(req.user.idusers)
+
+    await pool.query('UPDATE users SET isDisabled=? WHERE idusers=?', [
+      true,
+      req.user.idusers,
+    ])
+
+    res.status(200).json({ status: 200, message: 'User has been disabled' })
+  } catch (error) {
+    throw new Error()
+  }
+})
+export {
+  LogIn,
+  registerUser,
+  getUsers,
+  verifyUser,
+  getUserProfile,
+  disableUser,
+}

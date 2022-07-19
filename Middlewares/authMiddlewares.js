@@ -59,6 +59,14 @@ const verified = (req, res, next) => {
     throw new Error('Not Authorized; You are not verified')
   }
 }
+const notDisabled = (req, res, next) => {
+  if (req.user && !req.user.isDisabled) {
+    next()
+  } else {
+    res.status(401)
+    throw new Error('Not Authorized; Your Account Has Been Disabled')
+  }
+}
 
 const admin = (req, res, next) => {
   if (req.user && req.user.isAdmin) {
@@ -69,4 +77,4 @@ const admin = (req, res, next) => {
   }
 }
 
-export { admin, protect, verified }
+export { admin, protect, verified, notDisabled }
