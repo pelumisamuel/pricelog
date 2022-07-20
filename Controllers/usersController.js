@@ -1,5 +1,8 @@
 import asyncHandler from 'express-async-handler'
-import generateToken from '../Utils/generateToken.js'
+// import generateToken from '../Utils/generateToken.js'
+import nodemailer from 'nodemailer'
+import { generateToken, emailToken } from '../Utils/generateToken.js'
+import jwt from 'jsonwebtoken'
 
 import {
   matchPassword,
@@ -15,6 +18,17 @@ import {
 } from '../Models/userModel.js'
 import pool from '../config/db.js'
 
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 465,
+
+  auth: {
+    user: process.env.EMAIL_ADDRESS,
+    pass: 'vuzujstbquzgvyak',
+  },
+})
+
 //LOGIN USER
 const LogIn = asyncHandler(async (req, res) => {
   const { email, password } = req.body
@@ -23,10 +37,17 @@ const LogIn = asyncHandler(async (req, res) => {
   user = user[0][0]
 
   if (user && (await matchPassword(password, user.password))) {
+    if (!user.isEmailVerified) {
+      res.status(401).send({
+        status: 401,
+        message: 'Not Authorized, Verify Your Email First',
+      })
+    }
     if (!user.isVerified && !user.isAdmin) {
       res.status(401).send({
         status: 401,
-        message: 'Not Authorized, You Have Not Been Verified',
+        message:
+          'Not Authorized, You Have Not Been Verified. Please, Contact The Admin',
       })
 
       return
@@ -72,16 +93,28 @@ const registerUser = asyncHandler(async (req, res) => {
     } else {
       const result = await addOneUser(name, email, harshedPassword)
       //console.log(result)
-
+      console.log(email)
+      const url = `http://localhost:3000/api/users/confirmation/${emailToken(
+        result[0].insertId
+      )}`
+      await transporter.sendMail({
+        from: 'price log <priceloggger@gmail.com>',
+        to: email,
+        subject: 'Verify your Email',
+        html: `Please click this email to confirm your email: <a href="${url}">${url}</a>`,
+      })
+      // console.log(url)
+      // res.send('sent')
       res.send({
         status: 201,
-        message: 'Registration is successful',
-        data: {
-          name,
-          email,
-          id: result[0].insertId,
-          token: generateToken(result[0].insertId),
-        },
+        message:
+          'Registration is successful; Check your Email to start your Verification',
+        // data: {
+        //   name,
+        //   email,
+        //   id: result[0].insertId,
+        //   token: generateToken(result[0].insertId),
+        // },
       })
     }
   } catch (error) {
@@ -103,6 +136,31 @@ const getUserProfile = asyncHandler(async (req, res) => {
     throw new Error('profile not found')
   }
   //console.log(req.user.email)
+})
+
+const verifyEmail = asyncHandler(async (req, res) => {
+  try {
+    const decoded = jwt.verify(req.params.token, process.env.EMAIL_SECRET)
+
+    let user = await pool.query('select * from users where idusers=?', [
+      decoded.id,
+    ])
+    req.user = user[0][0]
+    if (req.user.isEmailVerified) {
+      res.send({ status: 406, message: 'you have already being verified' })
+    }
+
+    await pool.query('UPDATE users SET isEmailVerified=? WHERE idusers=?', [
+      true,
+      req.user.idusers,
+    ])
+
+    res
+      .status(200)
+      .json({ status: 200, message: 'Your Email has been Verified' })
+  } catch (error) {
+    throw new Error('This is link is invalid, or has expired')
+  }
 })
 
 //ADMIN FUNCTION
@@ -217,4 +275,5 @@ export {
   getUserProfile,
   disableUser,
   upgradeUser,
+  verifyEmail,
 }
