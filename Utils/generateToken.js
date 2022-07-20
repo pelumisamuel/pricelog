@@ -6,4 +6,10 @@ const generateToken = (id) => {
   })
 }
 
-export default generateToken
+const emailToken = (id) => {
+  return jwt.sign({ id }, process.env.EMAIL_SECRET, {
+    expiresIn: '24h',
+  })
+}
+
+export { generateToken, emailToken }
