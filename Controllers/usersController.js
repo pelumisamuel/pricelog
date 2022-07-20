@@ -208,6 +208,7 @@ const upgradeUser = asyncHandler(async (req, res) => {
     throw new Error()
   }
 })
+
 export {
   LogIn,
   registerUser,
