@@ -1,7 +1,7 @@
 import asyncHandler from 'express-async-handler'
 // import generateToken from '../Utils/generateToken.js'
-import nodemailer from 'nodemailer'
-import { generateToken, emailToken } from '../Utils/generateToken.js'
+
+import { generateToken } from '../Utils/generateToken.js'
 import jwt from 'jsonwebtoken'
 
 import {
@@ -17,17 +17,18 @@ import {
   getOneUserEmail,
 } from '../Models/userModel.js'
 import pool from '../config/db.js'
+import { sendVerificationLink } from '../Utils/sendEmail.js'
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  host: 'smtp.gmail.com',
-  port: 465,
+// const transporter = nodemailer.createTransport({
+//   service: 'gmail',
+//   host: 'smtp.gmail.com',
+//   port: 465,
 
-  auth: {
-    user: process.env.EMAIL_ADDRESS,
-    pass: 'vuzujstbquzgvyak',
-  },
-})
+//   auth: {
+//     user: process.env.EMAIL_ADDRESS,
+//     pass: 'vuzujstbquzgvyak',
+//   },
+// })
 
 //LOGIN USER
 const LogIn = asyncHandler(async (req, res) => {
@@ -40,8 +41,9 @@ const LogIn = asyncHandler(async (req, res) => {
     if (!user.isEmailVerified) {
       res.status(401).send({
         status: 401,
-        message: 'Not Authorized, Verify Your Email First',
+        message: 'Not Authorized, Check Your Email to Verify First',
       })
+      await sendVerificationLink(email, user.idusers)
     }
     if (!user.isVerified && !user.isAdmin) {
       res.status(401).send({
@@ -92,38 +94,35 @@ const registerUser = asyncHandler(async (req, res) => {
       res.status(400).send({ status: 400, message: 'User already exist' })
     } else {
       const result = await addOneUser(name, email, harshedPassword)
+      await sendVerificationLink(email, result[0].insertId)
       //console.log(result)
-      console.log(email)
-      const url = `http://localhost:3000/api/users/confirmation/${emailToken(
-        result[0].insertId
-      )}`
-      await transporter.sendMail({
-        from: 'price log <priceloggger@gmail.com>',
-        to: email,
-        subject: 'Verify your Email',
-        html: `Please click this email to confirm your email: <a href="${url}">${url}</a>`,
-      })
+
+      // const url = `http://localhost:3000/api/users/confirmation/${emailToken(
+      //   result[0].insertId
+      // )}`
+      // await transporter.sendMail({
+      //   from: 'price log <priceloggger@gmail.com>',
+      //   to: email,
+      //   subject: 'Verify your Email',
+      //   html: `Please click this email to confirm your email: <a href="${url}">${url}</a>`,
+      // })
       // console.log(url)
       // res.send('sent')
       res.send({
         status: 201,
         message:
           'Registration is successful; Check your Email to start your Verification',
-        // data: {
-        //   name,
-        //   email,
-        //   id: result[0].insertId,
-        //   token: generateToken(result[0].insertId),
-        // },
       })
     }
   } catch (error) {
     console.log(error)
     res
       .status(500)
-      .send({ status: 500, message: 'An error occur', data: error })
+      .send({ status: 500, message: 'A server error occur', data: error })
   }
 })
+
+//GET USER PROFILE WITH LOGGED IN TOKEN
 
 const getUserProfile = asyncHandler(async (req, res) => {
   try {
@@ -138,6 +137,8 @@ const getUserProfile = asyncHandler(async (req, res) => {
   //console.log(req.user.email)
 })
 
+// VERIFY USER EMAIL
+// verify email based on link sent to the User's email
 const verifyEmail = asyncHandler(async (req, res) => {
   try {
     const decoded = jwt.verify(req.params.token, process.env.EMAIL_SECRET)
@@ -145,9 +146,14 @@ const verifyEmail = asyncHandler(async (req, res) => {
     let user = await pool.query('select * from users where idusers=?', [
       decoded.id,
     ])
+
     req.user = user[0][0]
+
     if (req.user.isEmailVerified) {
-      res.send({ status: 406, message: 'you have already being verified' })
+      return res.send({
+        status: 406,
+        message: 'you have already being verified',
+      })
     }
 
     await pool.query('UPDATE users SET isEmailVerified=? WHERE idusers=?', [
@@ -231,6 +237,7 @@ const disableUser = asyncHandler(async (req, res) => {
     throw new Error()
   }
 })
+
 //ADMIN--UPGRADE USER TO ADMIN
 // 1. From route put api/users/:id
 // 2. Access = Private/Admin
@@ -248,7 +255,7 @@ const upgradeUser = asyncHandler(async (req, res) => {
     }
 
     req.user = user[0][0]
-    console.log(req.user.idusers)
+
     if (!req.user.isVerified) {
       res
         .status(406)
