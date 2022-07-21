@@ -200,7 +200,7 @@ const getUsers = asyncHandler(async (req, res) => {
 
     res.status(200).json(allUsers[0])
   } catch (error) {
-    throw new Error()
+    throw new Error('something is wrong')
   }
 })
 
