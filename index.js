@@ -3,7 +3,7 @@ import express from 'express'
 import cors from 'cors'
 import userRoutes from './Routes/userRoutes.js'
 import itemRoutes from './Routes/itemRoutes.js'
-import { errorHandler, notFound } from './middlewares/errorMiddlewares.js'
+import { errorHandler, notFound } from './Middlewares/errorMiddlewares.js'
 
 // initiallise express server
 const app = express()
