@@ -10,6 +10,11 @@ const app = express()
 app.use(express.json())
 
 app.use(cors())
+app.get('/', (req, res) => {
+  res.send('Api is running')
+  //   console.log(res.headersSent)
+  //   console.log(req.params)
+})
 
 //used Routes
 //USER
@@ -18,9 +23,9 @@ app.use('/api/users', userRoutes)
 app.use('/api/items', itemRoutes)
 
 //Error middilewares
-//app.use(notFound)
+app.use(notFound)
 app.use(errorHandler)
 // server and port
-app.get('/', (req, res) => res.send('Api is running'))
+
 const port = process.env.PORT || 8000
 app.listen(port, () => console.log(`Listening on port ${port}...`))
