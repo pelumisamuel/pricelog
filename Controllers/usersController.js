@@ -78,7 +78,9 @@ const LogIn = asyncHandler(async (req, res) => {
       },
     })
   } else {
-    res.status(401).send('email or username is invalid')
+    res
+      .status(401)
+      .send({ status: 401, message: 'email or username is invalid' })
   }
 })
 
@@ -166,6 +168,21 @@ const verifyEmail = asyncHandler(async (req, res) => {
       .json({ status: 200, message: 'Your Email has been Verified' })
   } catch (error) {
     throw new Error('This is link is invalid, or has expired')
+  }
+})
+//const changePassword = () => {}
+
+const resetPassword = asyncHandler(async (req, res) => {
+  try {
+    const { email } = req.body
+    let user = await getOneUser(email)
+    user = user[0][0]
+    if (!user) {
+      throw new Error('Your email does not exist with us')
+    } else {
+    }
+  } catch (error) {
+    console.log(error)
   }
 })
 
@@ -283,4 +300,5 @@ export {
   disableUser,
   upgradeUser,
   verifyEmail,
+  resetPassword,
 }

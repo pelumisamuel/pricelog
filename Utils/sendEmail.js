@@ -19,7 +19,7 @@ const sendVerificationLink = async (email, id) => {
       from: 'price log <priceloggger@gmail.com>',
       to: email,
       subject: 'Verify your Email',
-      html: `Please click this email to confirm your email: <a href="${url}">${url}</a>`,
+      html: `Please click this link to confirm your email: <a href="${url}">${url}</a>`,
     })
   } catch (error) {
     res.send(error)
