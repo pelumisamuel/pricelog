@@ -11,10 +11,13 @@ import {
 } from '../Utils/validate.js'
 import {
   addOneUser,
+  disableUserAccount,
   getAllUsers,
   getOneUser,
   getOneUserById,
   getOneUserEmail,
+  verifyUserAccount,
+  verifyUserEmail,
 } from '../Models/userModel.js'
 import pool from '../config/db.js'
 import { sendVerificationLink } from '../Utils/sendEmail.js'
@@ -33,7 +36,7 @@ import { sendVerificationLink } from '../Utils/sendEmail.js'
 //LOGIN USER
 const LogIn = asyncHandler(async (req, res) => {
   const { email, password } = req.body
-
+  console.log(process.env.USERR)
   let user = await getOneUser(email)
   user = user[0][0]
 
@@ -78,7 +81,9 @@ const LogIn = asyncHandler(async (req, res) => {
       },
     })
   } else {
-    res.status(401).send('email or username is invalid')
+    res
+      .status(401)
+      .send({ status: 401, message: 'email or username is invalid' })
   }
 })
 
@@ -142,10 +147,11 @@ const getUserProfile = asyncHandler(async (req, res) => {
 const verifyEmail = asyncHandler(async (req, res) => {
   try {
     const decoded = jwt.verify(req.params.token, process.env.EMAIL_SECRET)
+    // await pool.query('select * from users where idusers=?', [
+    //   decoded.id,
+    // ])
 
-    let user = await pool.query('select * from users where idusers=?', [
-      decoded.id,
-    ])
+    let user = await getOneUserById(decoded.id)
 
     req.user = user[0][0]
 
@@ -156,16 +162,30 @@ const verifyEmail = asyncHandler(async (req, res) => {
       })
     }
 
-    await pool.query('UPDATE users SET isEmailVerified=? WHERE idusers=?', [
-      true,
-      req.user.idusers,
-    ])
+    await verifyUserEmail(req.user.idusers)
 
     res
       .status(200)
       .json({ status: 200, message: 'Your Email has been Verified' })
   } catch (error) {
     throw new Error('This is link is invalid, or has expired')
+  }
+})
+//const changePassword = () => {}
+
+const resetPassword = asyncHandler(async (req, res) => {
+  try {
+    const { email } = req.body
+
+    // Sql query in user model that fetch one user by email
+    let user = await getOneUser(email)
+    user = user[0][0]
+    if (!user) {
+      throw new Error('Your email does not exist with us')
+    } else {
+    }
+  } catch (error) {
+    console.log(error)
   }
 })
 
@@ -180,7 +200,7 @@ const getUsers = asyncHandler(async (req, res) => {
 
     res.status(200).json(allUsers[0])
   } catch (error) {
-    throw new Error()
+    throw new Error('something is wrong')
   }
 })
 
@@ -189,9 +209,8 @@ const getUsers = asyncHandler(async (req, res) => {
 // 2. Access = Private/Admin
 const verifyUser = asyncHandler(async (req, res) => {
   try {
-    let user = await pool.query('SELECT * FROM users WHERE idusers=?', [
-      req.params.id,
-    ])
+    // Sql query in user model that fetch one user
+    let user = await getOneUserById(req.params.id)
     if (user[0].length === 0) {
       res
         .status(404)
@@ -200,10 +219,13 @@ const verifyUser = asyncHandler(async (req, res) => {
     }
     req.user = user[0][0]
 
-    await pool.query('UPDATE users SET isVerified=? WHERE idusers=?', [
-      true,
-      req.user.idusers,
-    ])
+    // await pool.query('UPDATE users SET isVerified=? WHERE idusers=?', [
+    //   true,
+    //   req.user.idusers,
+    // ])
+
+    // Sql query in user model that update the user account to verify
+    await verifyUserAccount(req.user.idusers)
 
     res.status(200).json({ status: 200, message: 'User has been verified' })
   } catch (error) {
@@ -216,9 +238,8 @@ const verifyUser = asyncHandler(async (req, res) => {
 // 2. Access = Private/Admin
 const disableUser = asyncHandler(async (req, res) => {
   try {
-    let user = await pool.query('SELECT * FROM users WHERE idusers=?', [
-      req.params.id,
-    ])
+    // Sql query in user model that fetch one user
+    let user = await getOneUserById(req.params.id)
     if (user[0].length === 0) {
       res
         .status(404)
@@ -227,10 +248,8 @@ const disableUser = asyncHandler(async (req, res) => {
     }
     req.user = user[0][0]
 
-    await pool.query('UPDATE users SET isDisabled=? WHERE idusers=?', [
-      true,
-      req.user.idusers,
-    ])
+    // Sql query in user model that disable the account
+    await disableUserAccount(req.user.idusers)
 
     res.status(200).json({ status: 200, message: 'User has been disabled' })
   } catch (error) {
@@ -244,9 +263,7 @@ const disableUser = asyncHandler(async (req, res) => {
 
 const upgradeUser = asyncHandler(async (req, res) => {
   try {
-    let user = await pool.query('SELECT * FROM users WHERE idusers=?', [
-      req.params.id,
-    ])
+    let user = await getOneUserById(req.params.id)
     if (user[0].length === 0) {
       res
         .status(404)
@@ -283,4 +300,5 @@ export {
   disableUser,
   upgradeUser,
   verifyEmail,
+  resetPassword,
 }
