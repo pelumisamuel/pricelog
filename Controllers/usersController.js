@@ -238,10 +238,6 @@ const verifyUser = asyncHandler(async (req, res) => {
 // 2. Access = Private/Admin
 const disableUser = asyncHandler(async (req, res) => {
   try {
-    // pool.query('SELECT * FROM users WHERE idusers=?', [
-    //   req.params.id,
-    // ])
-
     // Sql query in user model that fetch one user
     let user = await getOneUserById(req.params.id)
     if (user[0].length === 0) {
