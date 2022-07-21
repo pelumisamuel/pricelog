@@ -1,4 +1,4 @@
-import pool from '../Config/db.js'
+import pool from '../config/db.js'
 import asyncHandler from 'express-async-handler'
 import jwt from 'jsonwebtoken'
 
