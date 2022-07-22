@@ -8,7 +8,7 @@ import {
   getUserProfile,
   disableUser,
   verifyEmail,
-  resetPassword,
+  forgotPassword,
 } from '../Controllers/usersController.js'
 
 import { admin, protect, verified } from '../Middlewares/authMiddlewares.js'
@@ -19,7 +19,7 @@ router.post('/login', LogIn)
 router.put('/verify/:id', protect, admin, verifyUser)
 router.put('/disable/:id', protect, admin, disableUser)
 router.get('/confirmation/:token', verifyEmail)
-router.put('/reset', resetPassword)
+router.post('/reset', forgotPassword)
 
 router.get('/profile', protect, verified, getUserProfile)
 

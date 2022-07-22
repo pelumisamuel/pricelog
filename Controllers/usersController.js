@@ -144,6 +144,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
 })
 
 // VERIFY USER EMAIL
+
 // verify email based on link sent to the User's email
 const verifyEmail = asyncHandler(async (req, res) => {
   try {
@@ -174,7 +175,7 @@ const verifyEmail = asyncHandler(async (req, res) => {
 })
 //const changePassword = () => {}
 
-const resetPassword = asyncHandler(async (req, res) => {
+const forgotPassword = asyncHandler(async (req, res) => {
   try {
     const { email } = req.body
 
@@ -182,9 +183,12 @@ const resetPassword = asyncHandler(async (req, res) => {
     let user = await getOneUser(email)
     user = user[0][0]
     if (!user) {
-      throw new Error('Your email does not exist with us')
-    } else {
+      return res
+        .status(404)
+        .send({ status: 404, message: 'Your email does not exist with us' })
     }
+    console.log(user)
+    //await sendVerificationLink(email, user.idusers)
   } catch (error) {
     console.log(error)
   }
@@ -303,5 +307,5 @@ export {
   disableUser,
   upgradeUser,
   verifyEmail,
-  resetPassword,
+  forgotPassword,
 }
