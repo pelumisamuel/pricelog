@@ -11,6 +11,7 @@ import {
 } from '../Utils/validate.js'
 import {
   addOneUser,
+  createAdminAccount,
   disableUserAccount,
   getAllUsers,
   getOneUser,
@@ -19,7 +20,7 @@ import {
   verifyUserAccount,
   verifyUserEmail,
 } from '../Models/userModel.js'
-import pool from '../config/db.js'
+
 import { sendVerificationLink } from '../Utils/sendEmail.js'
 
 // const transporter = nodemailer.createTransport({
@@ -278,10 +279,12 @@ const upgradeUser = asyncHandler(async (req, res) => {
         .status(406)
         .send({ status: 406, message: 'Please verify the user first' })
     }
-    await pool.query('UPDATE users SET isAdmin=? WHERE idusers=?', [
-      true,
-      req.user.idusers,
-    ])
+    // await pool.query('UPDATE users SET isAdmin=? WHERE idusers=?', [
+    //   true,
+    //   req.user.idusers,
+    // ])
+
+    await createAdminAccount(req.user.idusers)
 
     res
       .status(200)

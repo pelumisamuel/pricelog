@@ -1,6 +1,9 @@
 import nodemailer from 'nodemailer'
 import { emailToken } from './generateToken.js'
 
+import dotenv from 'dotenv'
+dotenv.config()
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   host: 'smtp.gmail.com',

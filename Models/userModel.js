@@ -33,6 +33,9 @@ const verifyUserAccount = (id) => {
 const disableUserAccount = (id) => {
   return pool.query('UPDATE users SET isDisabled=? WHERE idusers=?', [true, id])
 }
+const createAdminAccount = (id) => {
+  return pool.query('UPDATE users SET isAdmin=? WHERE idusers=?', [true, id])
+}
 
 export {
   getAllUsers,
@@ -43,4 +46,5 @@ export {
   getOneUserById,
   verifyUserAccount,
   disableUserAccount,
+  createAdminAccount,
 }
