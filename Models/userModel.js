@@ -1,5 +1,5 @@
 // import pool from '../config/db'
-import pool from '../config/db.js'
+import pool from '../Config/db.js'
 
 const getAllUsers = () => {
   return pool.query('SELECT * FROM users')
