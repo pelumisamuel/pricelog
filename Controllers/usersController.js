@@ -47,6 +47,7 @@ const LogIn = asyncHandler(async (req, res) => {
         message: 'Not Authorized, Check Your Email to Verify First',
       })
       await sendVerificationLink(email, user.idusers)
+      return
     }
     if (!user.isVerified && !user.isAdmin) {
       res.status(401).send({
