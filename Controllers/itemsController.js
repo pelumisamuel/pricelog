@@ -1,5 +1,5 @@
 import asyncHandler from 'express-async-handler'
-import pool from '../config/db.js'
+import pool from '../Config/db.js'
 import { getAllItems, getOneItem } from '../Models/itemModel.js'
 
 const getItems = asyncHandler(async (req, res) => {
