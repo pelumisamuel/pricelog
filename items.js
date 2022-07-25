@@ -39,6 +39,16 @@ const items = [
     image: 'www.youtube.com',
     manufacturerId: 3,
   },
+  {
+    name: 'Laptop',
+    priceId: 4,
+    category: 'Electronics',
+    description: 'A laptop made with grit and nice energy',
+    vendorName: 'kilanko vender',
+    vendorAddr: 'no 2 kill and cure theme park',
+    image: 'www.youtube.com',
+    manufacturerId: 2,
+  },
 ]
 
 // {
