@@ -122,7 +122,7 @@ const registerUser = asyncHandler(async (req, res) => {
       })
     }
   } catch (error) {
-    console.log(error)
+    //console.log(error)
     res
       .status(500)
       .send({ status: 500, message: 'A server error occur', data: error })
