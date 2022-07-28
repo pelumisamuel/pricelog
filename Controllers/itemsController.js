@@ -43,18 +43,32 @@ const getItems = asyncHandler(async (req, res) => {
 const getItemID = asyncHandler(async (req, res) => {
   const id = req.params.id
   try {
-    const item = await getOneItem(id)
+    // const item = await getOneItem(id)
+    let item = await pool.query(
+      'SELECT DISTINCT * FROM items INNER JOIN categories ON items.categoryID = categories.categoryID WHERE items.itemId = ?',
+      [id]
+    )
+    //item = item[0][0]
     if (item[0].length === 0) {
       res
         .status(404)
         .json({ status: 404, message: 'Invalid Id, Item not found' })
       return
     }
+    item = item[0][0]
+
+    let properties = await pool.query(
+      'SELECT * FROM properties where categoryID = ?',
+      [item.categoryID]
+    )
+    // console.log(item.categoryID)
+    properties = properties[0]
 
     // console.log(item[0].length)
-    res.status(200).json(item[0][0])
+    res.status(200).json({ item, properties })
   } catch (error) {
     res.status(401).send(error)
   }
 })
+
 export { getItems, getItemID }

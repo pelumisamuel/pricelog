@@ -7,6 +7,6 @@ const router = Router()
 // get all currently showing movies
 router.get('/', getItems)
 
-router.get('/:id', protect, verified, getItemID)
+router.get('/:id', getItemID)
 
 export default router
