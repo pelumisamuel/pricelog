@@ -20,12 +20,12 @@ const getItems = asyncHandler(async (req, res) => {
     // // get the first element of the obj, because count(*); the first name is not selectable
     const count = countNo[Object.keys(countNo)[0]]
 
-    console.log(keyword, pageSize * (page - 1))
+    // console.log(keyword, pageSize * (page - 1))
     const items = await pool.query(
-      'SELECT * FROM items WHERE name LIKE ? OR description LIKE ? ORDER BY created LIMIT ? OFFSET ? ',
+      'SELECT * FROM items WHERE name LIKE ? OR description LIKE ? ORDER BY createdAt LIMIT ? OFFSET ? ',
       [keyword, keyword, pageSize, pageSize * (page - 1)]
     )
-    console.log(items[0].length)
+    // console.log(items[0].length)
 
     //const allItems = await getAllItems()
 
@@ -58,7 +58,7 @@ const getItemID = asyncHandler(async (req, res) => {
     item = item[0][0]
 
     let properties = await pool.query(
-      'SELECT * FROM properties where categoryID = ?',
+      'SELECT * FROM properties WHERE categoryID = ?',
       [item.categoryID]
     )
     // console.log(item.categoryID)
@@ -71,4 +71,49 @@ const getItemID = asyncHandler(async (req, res) => {
   }
 })
 
-export { getItems, getItemID }
+const getPropertiesKeys = asyncHandler(async (req, res) => {
+  const categoryID = req.params.id
+  try {
+    const keys = await pool.query(
+      'SELECT label, unit FROM properties_keys WHERE categoryID=?',
+      [categoryID]
+    )
+    if (keys[0].length === 0) {
+      res.status(404).send({ status: 404, message: 'Category is not found' })
+      return
+    }
+    res.status(200).json(keys[0])
+  } catch (error) {
+    res.status(404).send(error)
+  }
+})
+
+const getCategories = asyncHandler(async (req, res) => {
+  try {
+    const categories = await pool.query('SELECT * FROM categories')
+    // console.log(categories)
+    if (categories[0].length === 0) {
+      res.status(404).send({ status: 404, message: 'No category is available' })
+      return
+    }
+    res.status(200).json(categories[0])
+  } catch (error) {
+    res.status(404).send(error)
+  }
+})
+
+const addItemDetails = asyncHandler(async (req, res) => {
+  try {
+    const date = new Date()
+    const { name, manufacturer, modelNo, description, categoryID, imageUrl } =
+      req.body
+    const newItem = pool.query(
+      'INSERT into items SET name=?, manufacturer=?, modelNo=?, description=?, categoryID=?, image=?, createdAt=?',
+      [name, manufacturer, modelNo, description, categoryID, imageUrl, date]
+    )
+  } catch (error) {
+    res.status(401).send(error)
+  }
+})
+
+export { getItems, getItemID, addItemDetails, getCategories, getPropertiesKeys }
