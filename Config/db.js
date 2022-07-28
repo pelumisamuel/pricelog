@@ -10,6 +10,7 @@ const pool = mysql.createPool({
   waitForConnections: process.env.WAITFORCONNECTIONS,
   connectionLimit: process.env.CONNECTIONLIMIT,
   queueLimit: process.env.QUEUELIMIT,
+  // flags: '-FOUND_ROWS,IGNORE_SPACE',
 })
 
 if (pool.state === 'disconnected') {
