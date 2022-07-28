@@ -56,6 +56,12 @@ const getItemID = asyncHandler(async (req, res) => {
       return
     }
     item = item[0][0]
+    let currentPrice = await pool.query(
+      'SELECT price FROM prices WHERE itemID = ? ORDER BY createdAt Desc limit 1;',
+      [item.itemId]
+    )
+
+    currentPrice = currentPrice[0][0].price
 
     let properties = await pool.query(
       'SELECT * FROM properties WHERE categoryID = ?',
@@ -65,7 +71,7 @@ const getItemID = asyncHandler(async (req, res) => {
     properties = properties[0]
 
     // console.log(item[0].length)
-    res.status(200).json({ item, properties })
+    res.status(200).json({ ...item, currentPrice, properties })
   } catch (error) {
     res.status(401).send(error)
   }
