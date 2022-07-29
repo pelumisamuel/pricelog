@@ -4,7 +4,7 @@ import { getAllItems, getOneItem } from '../Models/itemModel.js'
 
 const getItems = asyncHandler(async (req, res) => {
   try {
-    const pageSize = 3
+    const pageSize = 10
     // get the current Page number from the url i.e GET/api/items?pageNumber=2
     // where pagenumber is the identifier and 2 the value
     const page = Number(req.query.pageNumber) || 1
@@ -55,13 +55,16 @@ const getItemID = asyncHandler(async (req, res) => {
         .json({ status: 404, message: 'Invalid Id, Item not found' })
       return
     }
+    //console.log(item[0][0])
     item = item[0][0]
+    console.log(item)
     let currentPrice = await pool.query(
-      'SELECT price FROM prices WHERE itemID = ? ORDER BY createdAt Desc limit 1;',
+      'SELECT price FROM prices WHERE itemId OR itemID = ? ORDER BY createdAt Desc limit 1;',
       [item.itemId]
     )
 
-    currentPrice = currentPrice[0][0].price
+    currentPrice = currentPrice[0][0].price ? currentPrice[0][0].price : 0
+    console.log(currentPrice)
 
     let properties = await pool.query(
       'SELECT * FROM properties WHERE categoryID = ?',
@@ -70,7 +73,8 @@ const getItemID = asyncHandler(async (req, res) => {
     // console.log(item.categoryID)
     properties = properties[0]
 
-    // console.log(item[0].length)
+    console.log(item.categoryID)
+    console.log(item)
     res.status(200).json({ ...item, currentPrice, properties })
   } catch (error) {
     res.status(401).send(error)

@@ -9,13 +9,13 @@ const getItemPrices = asyncHandler(async (req, res) => {
 
     const id = req.params.id
     let prices = await pool.query(
-      `SELECT * FROM prices WHERE itemID = ? ORDER BY ?? ${order}`,
+      `SELECT * FROM prices WHERE itemId = ? ORDER BY ?? ${order}`,
       [id, keyword]
     )
-
+    console.log(prices[0])
     //prices = prices[0]
     if (prices[0].length === 0) {
-      res.status(404).send('This Item Has No Prices yet')
+      res.status(404).json('This Item Has No Prices yet')
       return
     }
     // console.log(prices[0])
