@@ -13,13 +13,13 @@ const getItemPrices = asyncHandler(async (req, res) => {
       [id, keyword]
     )
 
-    prices = prices[0]
-    if (prices === 0) {
+    //prices = prices[0]
+    if (prices[0].length === 0) {
       res.status(404).send('This Item Has No Prices yet')
       return
     }
     // console.log(prices[0])
-    res.status(200).send(prices)
+    res.status(200).send(prices[0])
   } catch (error) {
     res.status(404).send(error)
   }
