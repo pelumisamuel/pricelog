@@ -32,11 +32,52 @@ const getCategories = asyncHandler(async (req, res) => {
   }
 })
 
-const addCategories = asyncHandler(async (req, res) => {
+const addCategoryName = asyncHandler(async (req, res) => {
+  try {
+    const { categoryName, categoryDescription, itemId } = req.body
+    const categoryExist = await pool.query(
+      'SELECT categoryName FROM categories WHERE categoryName =?',
+      [categoryName]
+    )
+    if (categoryExist[0].length > 0) {
+      return res
+        .status(400)
+        .send({ status: 400, message: 'Category already exist' })
+    }
+    //console.log(categoryExist[0].length)
+    const category = await pool.query(
+      'INSERT INTO categories SET categoryName=?, categoryDescription=?',
+      [categoryName, categoryDescription]
+    )
+    res.send({
+      status: 201,
+      message: 'category created Successfully',
+      categoryId: category[0].insertId,
+    })
+  } catch (error) {
+    res.status().send(error)
+  }
+})
+const addPropertiesKeys = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id
-    const { label, value } = req.body
-  } catch (error) {}
+    const properties = req.body
+
+    const newProperty = properties.map(async (property) => {
+      await pool.query(
+        'INSERT INTO properties_keys SET categoryID=?, label=?, unit=?',
+        [id, property.label, property.unit]
+      )
+    })
+
+    // await Promise.all(newProperty)
+    // console.log(await promise.all(newProperty))
+    res
+      .status(201)
+      .status({ status: 201, message: 'Properties created succesfully' })
+  } catch (error) {
+    throw new Error(error)
+  }
 })
 
-export { addCategories, getCategories, getPropertiesKeys }
+export { addCategoryName, getCategories, getPropertiesKeys, addPropertiesKeys }

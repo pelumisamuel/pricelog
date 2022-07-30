@@ -48,33 +48,31 @@ const getItemID = asyncHandler(async (req, res) => {
       'SELECT DISTINCT * FROM items INNER JOIN categories ON items.categoryID = categories.categoryID WHERE items.itemId = ?',
       [id]
     )
-    //item = item[0][0]
+
     if (item[0].length === 0) {
       res
         .status(404)
         .json({ status: 404, message: 'Invalid Id, Item not found' })
       return
     }
-    //console.log(item[0][0])
+
     item = item[0][0]
-    console.log(item)
+
     let currentPrice = await pool.query(
       'SELECT price FROM prices WHERE itemId OR itemID = ? ORDER BY createdAt Desc limit 1;',
       [item.itemId]
     )
 
     currentPrice = currentPrice[0][0].price ? currentPrice[0][0].price : 0
-    console.log(currentPrice)
 
     let properties = await pool.query(
       'SELECT * FROM properties WHERE categoryID = ?',
       [item.categoryID]
     )
-    // console.log(item.categoryID)
+
     properties = properties[0]
 
-    console.log(item.categoryID)
-    console.log(item)
+    // console.log(item)
     res.status(200).json({ ...item, currentPrice, properties })
   } catch (error) {
     res.status(401).send(error)
