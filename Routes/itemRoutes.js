@@ -1,17 +1,10 @@
 import { Router } from 'express'
-import {
-  getCategories,
-  getItemID,
-  getItems,
-  getPropertiesKeys,
-} from '../Controllers/itemsController.js'
-import { protect, verified } from '../Middlewares/authMiddlewares.js'
+import { getItemID, getItems } from '../Controllers/itemsController.js'
+import { admin, protect, verified } from '../Middlewares/authMiddlewares.js'
 
 const router = Router()
 
 router.get('/', protect, verified, getItems)
-router.get('/categories', protect, verified, getCategories)
-router.get('/properties/:id', protect, verified, getPropertiesKeys)
 
 router.get('/:id', getItemID)
 

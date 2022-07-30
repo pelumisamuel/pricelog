@@ -12,7 +12,7 @@ const getItemPrices = asyncHandler(async (req, res) => {
       `SELECT * FROM prices WHERE itemId = ? ORDER BY ?? ${order}`,
       [id, keyword]
     )
-    console.log(prices[0])
+
     //prices = prices[0]
     if (prices[0].length === 0) {
       res.status(404).json('This Item Has No Prices yet')
