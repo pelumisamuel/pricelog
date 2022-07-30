@@ -4,7 +4,7 @@ import { getAllItems, getOneItem } from '../Models/itemModel.js'
 
 const getItems = asyncHandler(async (req, res) => {
   try {
-    const pageSize = 3
+    const pageSize = 10
     // get the current Page number from the url i.e GET/api/items?pageNumber=2
     // where pagenumber is the identifier and 2 the value
     const page = Number(req.query.pageNumber) || 1
@@ -48,67 +48,38 @@ const getItemID = asyncHandler(async (req, res) => {
       'SELECT DISTINCT * FROM items INNER JOIN categories ON items.categoryID = categories.categoryID WHERE items.itemId = ?',
       [id]
     )
-    //item = item[0][0]
+
     if (item[0].length === 0) {
       res
         .status(404)
         .json({ status: 404, message: 'Invalid Id, Item not found' })
       return
     }
+
     item = item[0][0]
+
     let currentPrice = await pool.query(
-      'SELECT price FROM prices WHERE itemID = ? ORDER BY createdAt Desc limit 1;',
+      'SELECT price FROM prices WHERE itemId OR itemID = ? ORDER BY createdAt Desc limit 1;',
       [item.itemId]
     )
 
-    currentPrice = currentPrice[0][0].price
+    currentPrice = currentPrice[0][0].price ? currentPrice[0][0].price : 0
 
     let properties = await pool.query(
       'SELECT * FROM properties WHERE categoryID = ?',
       [item.categoryID]
     )
-    // console.log(item.categoryID)
+
     properties = properties[0]
 
-    // console.log(item[0].length)
+    // console.log(item)
     res.status(200).json({ ...item, currentPrice, properties })
   } catch (error) {
     res.status(401).send(error)
   }
 })
 
-const getPropertiesKeys = asyncHandler(async (req, res) => {
-  const categoryID = req.params.id
-  try {
-    const keys = await pool.query(
-      'SELECT label, unit FROM properties_keys WHERE categoryID=?',
-      [categoryID]
-    )
-    if (keys[0].length === 0) {
-      res.status(404).send({ status: 404, message: 'Category is not found' })
-      return
-    }
-    res.status(200).json(keys[0])
-  } catch (error) {
-    res.status(404).send(error)
-  }
-})
-
-const getCategories = asyncHandler(async (req, res) => {
-  try {
-    const categories = await pool.query('SELECT * FROM categories')
-    // console.log(categories)
-    if (categories[0].length === 0) {
-      res.status(404).send({ status: 404, message: 'No category is available' })
-      return
-    }
-    res.status(200).json(categories[0])
-  } catch (error) {
-    res.status(404).send(error)
-  }
-})
-
-const addItemDetails = asyncHandler(async (req, res) => {
+const addItem = asyncHandler(async (req, res) => {
   try {
     const date = new Date()
     const { name, manufacturer, modelNo, description, categoryID, imageUrl } =
@@ -122,4 +93,4 @@ const addItemDetails = asyncHandler(async (req, res) => {
   }
 })
 
-export { getItems, getItemID, addItemDetails, getCategories, getPropertiesKeys }
+export { getItems, getItemID, addItem }
