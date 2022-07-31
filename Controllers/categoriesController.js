@@ -70,14 +70,16 @@ const addPropertiesKeys = asyncHandler(async (req, res) => {
       )
     })
 
-    // await Promise.all(newProperty)
-    // console.log(await promise.all(newProperty))
+    // const data = await Promise.all(newProperty)
+    // console.log(newProperty)
+    //console.log(await promise.all(newProperty))
     res
       .status(201)
-      .status({ status: 201, message: 'Properties created succesfully' })
+      .send({ status: 201, message: 'Properties created succesfully' })
   } catch (error) {
     throw new Error(error)
   }
 })
+/// create a controller that fetch existing property keys
 
 export { addCategoryName, getCategories, getPropertiesKeys, addPropertiesKeys }
