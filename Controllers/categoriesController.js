@@ -34,7 +34,7 @@ const getCategories = asyncHandler(async (req, res) => {
 
 const addCategoryName = asyncHandler(async (req, res) => {
   try {
-    const { categoryName, categoryDescription, itemId } = req.body
+    const { categoryName, categoryDescription } = req.body
     const categoryExist = await pool.query(
       'SELECT categoryName FROM categories WHERE categoryName =?',
       [categoryName]

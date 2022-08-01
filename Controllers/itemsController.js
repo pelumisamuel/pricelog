@@ -96,5 +96,18 @@ const addItem = asyncHandler(async (req, res) => {
 })
 
 // ADD PROPERTIES TO ITEM
+const addPropertiesToItem = asyncHandler(async (req, res) => {
+  try {
+    const id = req.params.id
+    const properties = req.body
 
-export { getItems, getItemID, addItem }
+    properties.map(async (property) => {
+      await pool.query(
+        'INSERT INTO properties SET categoryID=?, label=?, value=?',
+        [id, property.label, property.value]
+      )
+    })
+  } catch (error) {}
+})
+
+export { getItems, getItemID, addItem, addPropertiesToItem }
