@@ -9,9 +9,10 @@ const getPropertiesKeys = asyncHandler(async (req, res) => {
       [categoryID]
     )
     if (keys[0].length === 0) {
-      res.status(404).send({ status: 404, message: 'Category is not found' })
+      res.status(204).send({ status: 404, message: 'Category has no property' })
       return
     }
+    console.log(keys)
     res.status(200).json(keys[0])
   } catch (error) {
     res.status(404).send(error)

@@ -49,7 +49,8 @@ const getItemID = asyncHandler(async (req, res) => {
       'SELECT DISTINCT * FROM items INNER JOIN categories ON items.categoryID = categories.categoryID WHERE items.itemId = ?',
       [id]
     )
-
+    // QUERY TO fetch MULTIPLE categories with an item
+    ;('SELECT DISTINCT * FROM items INNER JOIN category_item ON items.itemId = category_item.itemId JOIN categories ON category_item.categoryID = categories.categoryID WHERE items.itemId =?')
     if (item[0].length === 0) {
       res
         .status(404)
@@ -107,7 +108,9 @@ const addPropertiesToItem = asyncHandler(async (req, res) => {
         [id, property.label, property.value]
       )
     })
-  } catch (error) {}
+  } catch (error) {
+    res.status().send(error)
+  }
 })
 
 export { getItems, getItemID, addItem, addPropertiesToItem }
