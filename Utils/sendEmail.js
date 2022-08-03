@@ -17,7 +17,12 @@ const transporter = nodemailer.createTransport({
 
 const sendVerificationLink = async (email, id) => {
   try {
-    const url = `http://localhost:3000/api/users/confirmation/${emailToken(id)}`
+    const url = `http://${
+      process.env.DOMAIN
+    }/api/users/confirmation/${emailToken(id)}`
+    /**
+    I neeed to refactor the the transporter to accomadate various url , subject and html body 
+    **/
     await transporter.sendMail({
       from: 'price log <priceloggger@gmail.com>',
       to: email,
