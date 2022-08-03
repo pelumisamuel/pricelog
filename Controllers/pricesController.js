@@ -9,7 +9,7 @@ const getItemPrices = asyncHandler(async (req, res) => {
 
     const id = req.params.id
     let prices = await pool.query(
-      `SELECT * FROM prices WHERE itemId = ? ORDER BY ?? ${order}`,
+      `SELECT * FROM prices WHERE itemId = ? AND isDeclined = false ORDER BY ?? ${order}`,
       [id, keyword]
     )
 
@@ -25,4 +25,49 @@ const getItemPrices = asyncHandler(async (req, res) => {
   }
 })
 
-export { getItemPrices }
+const addVendor = asyncHandler(async (req, res) => {
+  try {
+    const { name, address, state, city, country, url } = req.body
+
+    const vendorExist = await pool.query(
+      'SELECT vendorName FROM vendors WHERE vendorName =?',
+      [name]
+    )
+    if (vendorExist[0].length > 0) {
+      return res
+        .status(400)
+        .send({ status: 400, message: 'Vendor already exist' })
+    }
+    const vendor = await pool.query(
+      'INSERT INTO vendors SET vendorName = ?, vendorAddr = ?, state = ?, city=?, country=? url=?',
+      [name, address, state, city, country, url]
+    )
+    res.send({
+      status: 201,
+      message: 'Vendor created Successfully',
+      vendorId: vendor[0].insertId,
+    })
+  } catch (error) {
+    res.status(500).send(error)
+  }
+})
+
+const addPrice = asyncHandler(async (req, res) => {
+  try {
+    //const itemId =req.params.id
+    const { price, itemId, quantity, vendorId } = req.body
+
+    const newPrice = await pool.query(
+      'INSERT INTO prices SET price=?,itemId=?, quantity=?, vendorId=?',
+      [price, itemId, quantity, vendorId]
+    )
+    res.send({
+      status: 201,
+      message: 'New Price created Successfully, Please wait for approval',
+    })
+  } catch (error) {
+    res.status(500).send(error)
+  }
+})
+
+export { getItemPrices, addPrice, addVendor }

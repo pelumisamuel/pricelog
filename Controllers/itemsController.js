@@ -10,7 +10,7 @@ const getItems = asyncHandler(async (req, res) => {
     const page = Number(req.query.pageNumber) || 1
     //console.log(req.query.pageNumber, req.query.keyword)
     let keyword = req.query.keyword ? '%' + req.query.keyword + '%' : '%'
-
+    const categoryID = 4
     let countNo = await pool.query(
       'SELECT COUNT(*) FROM items WHERE name LIKE ? OR description LIKE ?',
       [keyword, keyword]
@@ -22,10 +22,11 @@ const getItems = asyncHandler(async (req, res) => {
 
     // console.log(keyword, pageSize * (page - 1))
     const items = await pool.query(
-      'SELECT * FROM items WHERE name LIKE ? OR description LIKE ? ORDER BY createdAt LIMIT ? OFFSET ? ',
+      'SELECT * FROM items WHERE name LIKE ? OR description LIKE ?  ORDER BY createdAt LIMIT ? OFFSET ? ',
       [keyword, keyword, pageSize, pageSize * (page - 1)]
     )
     // console.log(items[0].length)
+    console.log(categoryID)
 
     //const allItems = await getAllItems()
 
@@ -48,7 +49,8 @@ const getItemID = asyncHandler(async (req, res) => {
       'SELECT DISTINCT * FROM items INNER JOIN categories ON items.categoryID = categories.categoryID WHERE items.itemId = ?',
       [id]
     )
-
+    // QUERY TO fetch MULTIPLE categories with an item
+    ;('SELECT DISTINCT * FROM items INNER JOIN category_item ON items.itemId = category_item.itemId JOIN categories ON category_item.categoryID = categories.categoryID WHERE items.itemId =?')
     if (item[0].length === 0) {
       res
         .status(404)
@@ -79,6 +81,7 @@ const getItemID = asyncHandler(async (req, res) => {
   }
 })
 
+/// ADD NEW ITEM TO THE DATABASE
 const addItem = asyncHandler(async (req, res) => {
   try {
     const date = new Date()
@@ -93,4 +96,21 @@ const addItem = asyncHandler(async (req, res) => {
   }
 })
 
-export { getItems, getItemID, addItem }
+// ADD PROPERTIES TO ITEM
+const addPropertiesToItem = asyncHandler(async (req, res) => {
+  try {
+    const id = req.params.id
+    const properties = req.body
+
+    properties.map(async (property) => {
+      await pool.query(
+        'INSERT INTO properties SET categoryID=?, label=?, value=?',
+        [id, property.label, property.value]
+      )
+    })
+  } catch (error) {
+    res.status().send(error)
+  }
+})
+
+export { getItems, getItemID, addItem, addPropertiesToItem }

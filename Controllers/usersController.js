@@ -125,7 +125,7 @@ const registerUser = asyncHandler(async (req, res) => {
     //console.log(error)
     res
       .status(500)
-      .send({ status: 500, message: 'A server error occur', data: error })
+      .send({ status: 500, message: 'Registration failed', data: error })
   }
 })
 
