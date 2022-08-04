@@ -19,7 +19,7 @@ router
 // properties routes
 router
   .route('/:id/properties')
-  .get(protect, verified, getPropertiesKeys)
-  .post(protect, verified, addPropertiesKeys)
+  .get(protect, verified, admin, getPropertiesKeys)
+  .post(protect, verified, admin, addPropertiesKeys)
 
 export default router

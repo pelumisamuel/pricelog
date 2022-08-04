@@ -2,6 +2,8 @@ import asyncHandler from 'express-async-handler'
 import pool from '../Config/db.js'
 import { getAllItems, getOneItem } from '../Models/itemModel.js'
 
+// FOR USERS
+// controller that fetches all the items available in the database
 const getItems = asyncHandler(async (req, res) => {
   try {
     const pageSize = 10
@@ -10,23 +12,31 @@ const getItems = asyncHandler(async (req, res) => {
     const page = Number(req.query.pageNumber) || 1
     //console.log(req.query.pageNumber, req.query.keyword)
     let keyword = req.query.keyword ? '%' + req.query.keyword + '%' : '%'
-    const categoryID = 4
+    const categoryID = req.query.category
+
+    // check filter by a category if it was choosen other was filter using the like
+    const query = categoryID
+      ? 'categoryId=' + categoryID
+      : `name LIKE '${keyword}' OR description LIKE '${keyword}'`
+    console.log(query)
+
     let countNo = await pool.query(
-      'SELECT COUNT(*) FROM items WHERE name LIKE ? OR description LIKE ?',
+      `SELECT COUNT(*) FROM items WHERE ${query}`,
       [keyword, keyword]
     )
     countNo = countNo[0][0]
-
     // // get the first element of the obj, because count(*); the first name is not selectable
     const count = countNo[Object.keys(countNo)[0]]
 
+    //keyword = null
     // console.log(keyword, pageSize * (page - 1))
     const items = await pool.query(
-      'SELECT * FROM items WHERE name LIKE ? OR description LIKE ?  ORDER BY createdAt LIMIT ? OFFSET ? ',
-      [keyword, keyword, pageSize, pageSize * (page - 1)]
+      `SELECT * FROM items WHERE ${query} ORDER BY createdAt LIMIT ? OFFSET ? `,
+      [pageSize, pageSize * (page - 1)]
     )
+
     // console.log(items[0].length)
-    console.log(categoryID)
+    // console.log(categoryID)
 
     //const allItems = await getAllItems()
 
@@ -40,7 +50,7 @@ const getItems = asyncHandler(async (req, res) => {
   //getOneItem()
 })
 
-// get each item by id
+// A controller that get each item by id
 const getItemID = asyncHandler(async (req, res) => {
   const id = req.params.id
   try {
@@ -50,7 +60,7 @@ const getItemID = asyncHandler(async (req, res) => {
       [id]
     )
     // QUERY TO fetch MULTIPLE categories with an item
-    ;('SELECT DISTINCT * FROM items INNER JOIN category_item ON items.itemId = category_item.itemId JOIN categories ON category_item.categoryID = categories.categoryID WHERE items.itemId =?')
+    //;('SELECT DISTINCT * FROM items INNER JOIN category_item ON items.itemId = category_item.itemId JOIN categories ON category_item.categoryID = categories.categoryID WHERE items.itemId =?')
     if (item[0].length === 0) {
       res
         .status(404)
@@ -85,18 +95,26 @@ const getItemID = asyncHandler(async (req, res) => {
 const addItem = asyncHandler(async (req, res) => {
   try {
     const date = new Date()
-    const { name, manufacturer, modelNo, description, categoryID, imageUrl } =
-      req.body
+    const {
+      name,
+      manufacturer,
+      modelNo,
+      vendorId,
+      description,
+      categoryID,
+      imageUrl,
+    } = req.body
     const newItem = pool.query(
       'INSERT into items SET name=?, manufacturer=?, modelNo=?, description=?, categoryID=?, image=?, createdAt=?',
       [name, manufacturer, modelNo, description, categoryID, imageUrl, date]
     )
+    res.status(201).send('Item ')
   } catch (error) {
     res.status(401).send(error)
   }
 })
 
-// ADD PROPERTIES TO ITEM
+// ADD PROPERTIES TO ONE ITEM
 const addPropertiesToItem = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id

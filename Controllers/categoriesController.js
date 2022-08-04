@@ -1,6 +1,10 @@
 import asyncHandler from 'express-async-handler'
 import pool from '../Config/db.js'
 
+//USERS
+
+// A controller that fetches all the properties need for a particular category
+// To be call after a category has been called
 const getPropertiesKeys = asyncHandler(async (req, res) => {
   const categoryID = req.params.id
   try {
@@ -19,6 +23,7 @@ const getPropertiesKeys = asyncHandler(async (req, res) => {
   }
 })
 
+// A controller that fetches all the categories available in the database
 const getCategories = asyncHandler(async (req, res) => {
   try {
     const categories = await pool.query('SELECT * FROM categories')
@@ -33,6 +38,8 @@ const getCategories = asyncHandler(async (req, res) => {
   }
 })
 
+//FOR ADMIN
+// A Controller that create a new category
 const addCategoryName = asyncHandler(async (req, res) => {
   try {
     const { categoryName, categoryDescription } = req.body
@@ -59,6 +66,9 @@ const addCategoryName = asyncHandler(async (req, res) => {
     res.status().send(error)
   }
 })
+
+// controller that propperty keys that are needed to one category
+
 const addPropertiesKeys = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id
