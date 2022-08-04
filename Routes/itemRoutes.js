@@ -4,8 +4,8 @@ import { admin, protect, verified } from '../Middlewares/authMiddlewares.js'
 
 const router = Router()
 
-router.get('/', getItems)
+router.get('/', protect, verified, getItems)
 
-router.get('/:id', getItemID)
+router.get('/:id', protect, verified, getItemID)
 
 export default router
