@@ -16,8 +16,8 @@ router.post('/', upload.single('image'), async (req, res) => {
 
     //const result = await cloudinary.uploader.upload(req.file.path)
 
-    res.send({ message: 'upload successful', result })
-    console.log(req.file.path, result)
+    res.send({ message: 'Image uploaded successfully', link: result.url })
+    //console.log(req.file.path, result)
   } catch (error) {
     res.send(error)
   }

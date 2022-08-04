@@ -1,5 +1,6 @@
 import asyncHandler from 'express-async-handler'
 import pool from '../Config/db.js'
+import { uploads } from '../Utils/cloudinary.js'
 import { getAllItems, getOneItem } from '../Models/itemModel.js'
 
 // FOR USERS
@@ -95,27 +96,16 @@ const getItemID = asyncHandler(async (req, res) => {
 const addItem = asyncHandler(async (req, res) => {
   try {
     const date = new Date()
-    const {
-      name,
-      manufacturer,
-      modelNo,
-      vendorId,
-      description,
-      categoryID,
-      imageUrl,
-    } = req.body
+    const { name, manufacturer, imgUrl, modelNo, description, categoryID } =
+      req.body
 
-    await cloudinary.uploader.upload(file, function (error, result) {
-      console.log({
-        result,
-        error,
-      })
-    })
     const newItem = pool.query(
       'INSERT into items SET name=?, manufacturer=?, modelNo=?, description=?, categoryID=?, image=?, createdAt=?',
-      [name, manufacturer, modelNo, description, categoryID, imageUrl, date]
+      [name, manufacturer, modelNo, description, categoryID, imgUrl, date]
     )
-    res.status(201).send('Item ')
+    res
+      .status(201)
+      .send({ name, manufacturer, imgUrl, modelNo, description, categoryID })
   } catch (error) {
     res.status(401).send(error)
   }
@@ -133,8 +123,9 @@ const addPropertiesToItem = asyncHandler(async (req, res) => {
         [id, property.label, property.value]
       )
     })
+    res.status(200).send('properties added succesfully')
   } catch (error) {
-    res.status().send(error)
+    res.status(401).send(error)
   }
 })
 

@@ -8,6 +8,7 @@ const getItemPrices = asyncHandler(async (req, res) => {
     //order = order.replace(/\'/g, '')
 
     const id = req.params.id
+
     let prices = await pool.query(
       `SELECT * FROM prices WHERE itemId = ? AND isDeclined = false ORDER BY ?? ${order}`,
       [id, keyword]
