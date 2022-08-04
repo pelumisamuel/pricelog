@@ -104,6 +104,13 @@ const addItem = asyncHandler(async (req, res) => {
       categoryID,
       imageUrl,
     } = req.body
+
+    await cloudinary.uploader.upload(file, function (error, result) {
+      console.log({
+        result,
+        error,
+      })
+    })
     const newItem = pool.query(
       'INSERT into items SET name=?, manufacturer=?, modelNo=?, description=?, categoryID=?, image=?, createdAt=?',
       [name, manufacturer, modelNo, description, categoryID, imageUrl, date]

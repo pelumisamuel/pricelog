@@ -5,6 +5,9 @@ import userRoutes from './Routes/userRoutes.js'
 import itemRoutes from './Routes/itemRoutes.js'
 import priceRoutes from './Routes/priceRoutes.js'
 import categoryRoutes from './Routes/categoryRoutes.js'
+import uploadRoutes from './Routes/uploadRoutes.js'
+import fs from 'fs'
+import multer from 'multer'
 import { errorHandler, notFound } from './Middlewares/errorMiddlewares.js'
 
 // initiallise express server
@@ -28,6 +31,8 @@ app.use('/api/items', itemRoutes)
 app.use('/api/prices', priceRoutes)
 
 app.use('/api/categories', categoryRoutes)
+
+app.use('/api/uploads', uploadRoutes)
 
 //Error middilewares
 app.use(notFound)
