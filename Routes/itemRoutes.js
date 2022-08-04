@@ -1,11 +1,24 @@
 import { Router } from 'express'
-import { getItemID, getItems } from '../Controllers/itemsController.js'
+import {
+  addItem,
+  addPropertiesToItem,
+  getItemID,
+  getItems,
+} from '../Controllers/itemsController.js'
 import { admin, protect, verified } from '../Middlewares/authMiddlewares.js'
+
+import { upload } from '../Utils/multer.js'
 
 const router = Router()
 
-router.get('/', protect, verified, getItems)
+router
+  .route('/')
+  .get(protect, verified, getItems)
+  .post(protect, verified, addItem)
 
-router.get('/:id', getItemID)
+router
+  .route('/:id')
+  .get(protect, verified, getItemID)
+  .post(protect, verified, addPropertiesToItem)
 
 export default router

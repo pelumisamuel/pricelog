@@ -8,6 +8,7 @@ const getItemPrices = asyncHandler(async (req, res) => {
     //order = order.replace(/\'/g, '')
 
     const id = req.params.id
+
     let prices = await pool.query(
       `SELECT * FROM prices WHERE itemId = ? AND isDeclined = false ORDER BY ?? ${order}`,
       [id, keyword]
@@ -54,12 +55,14 @@ const addVendor = asyncHandler(async (req, res) => {
 
 const addPrice = asyncHandler(async (req, res) => {
   try {
-    //const itemId =req.params.id
-    const { price, itemId, quantity, vendorId } = req.body
+    const date = new Date()
+
+    const itemId = req.params.id
+    const { price, quantity, vendorId } = req.body
 
     const newPrice = await pool.query(
-      'INSERT INTO prices SET price=?,itemId=?, quantity=?, vendorId=?',
-      [price, itemId, quantity, vendorId]
+      'INSERT INTO prices SET price=?,itemId=?, quantity=?, vendorId=?, createdAt=?',
+      [price, itemId, quantity, vendorId, date]
     )
     res.send({
       status: 201,
