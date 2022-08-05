@@ -94,20 +94,30 @@ const getItemID = asyncHandler(async (req, res) => {
 
 /// ADD NEW ITEM TO THE DATABASE
 const addItem = asyncHandler(async (req, res) => {
+  const { name, manufacturer, imgUrl, modelNo, description, categoryID } =
+    req.body
+  const date = new Date()
   try {
-    const date = new Date()
-    const { name, manufacturer, imgUrl, modelNo, description, categoryID } =
-      req.body
-
-    const newItem = pool.query(
+    const newItem = await pool.query(
       'INSERT into items SET name=?, manufacturer=?, modelNo=?, description=?, categoryID=?, image=?, createdAt=?',
       [name, manufacturer, modelNo, description, categoryID, imgUrl, date]
     )
-    res
-      .status(201)
-      .send({ name, manufacturer, imgUrl, modelNo, description, categoryID })
+    res.status(201).send({
+      status: 201,
+      message: 'Item created Succesfully',
+      item: {
+        id: newItem[0].insertId,
+        name,
+        manufacturer,
+        imgUrl,
+        modelNo,
+        description,
+        categoryID,
+      },
+    })
   } catch (error) {
     res.status(401).send(error)
+    //throw new Error(error)
   }
 })
 
