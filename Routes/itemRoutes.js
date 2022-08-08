@@ -2,6 +2,7 @@ import { Router } from 'express'
 import {
   addItem,
   addPropertiesToItem,
+  deleteItem,
   getItemID,
   getItems,
 } from '../Controllers/itemsController.js'
@@ -20,5 +21,6 @@ router
   .route('/:id')
   .get(protect, verified, getItemID)
   .post(protect, verified, addPropertiesToItem)
+  .delete(protect, verified, admin, deleteItem)
 
 export default router

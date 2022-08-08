@@ -4,6 +4,8 @@ import path from 'path'
 
 //import cloudinary from '../Utils/cloudinary.js'
 
+/// save Image to a folder
+
 // const storage = multer.diskStorage({
 //   destination(req, file, cb) {
 //     cb(null, './uploads/')

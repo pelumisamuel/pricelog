@@ -8,6 +8,7 @@ import { getAllItems, getOneItem } from '../Models/itemModel.js'
 const getItems = asyncHandler(async (req, res) => {
   try {
     const pageSize = 10
+    console.log(process.env.DOMAIN)
     // get the current Page number from the url i.e GET/api/items?pageNumber=2
     // where pagenumber is the identifier and 2 the value
     const page = Number(req.query.pageNumber) || 1
@@ -35,11 +36,6 @@ const getItems = asyncHandler(async (req, res) => {
       `SELECT * FROM items WHERE ${query} ORDER BY createdAt LIMIT ? OFFSET ? `,
       [pageSize, pageSize * (page - 1)]
     )
-
-    // console.log(items[0].length)
-    // console.log(categoryID)
-
-    //const allItems = await getAllItems()
 
     res
       .status(200)
@@ -121,6 +117,16 @@ const addItem = asyncHandler(async (req, res) => {
   }
 })
 
+// DELETE ONE ITEM
+const deleteItem = asyncHandler(async (req, res) => {
+  try {
+    await pool.query('DELETE FROM items WHERE itemId=?', [req.params.id])
+    res.status(200).json('Item deleted succesfully')
+  } catch (error) {
+    res.status(404).json(error)
+  }
+})
+
 // ADD PROPERTIES TO ONE ITEM
 const addPropertiesToItem = asyncHandler(async (req, res) => {
   try {
@@ -139,4 +145,4 @@ const addPropertiesToItem = asyncHandler(async (req, res) => {
   }
 })
 
-export { getItems, getItemID, addItem, addPropertiesToItem }
+export { getItems, getItemID, addItem, addPropertiesToItem, deleteItem }

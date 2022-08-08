@@ -73,4 +73,20 @@ const addPrice = asyncHandler(async (req, res) => {
   }
 })
 
-export { getItemPrices, addPrice, addVendor }
+const verifyPrice = asyncHandler(async (req, res) => {
+  try {
+    const { priceId } = req.body
+    await pool.query('UPDATE prices set isVerified=? WHERE priceID=?', [
+      true,
+      priceId,
+    ])
+    res
+      .status(200)
+      .json({ status: 200, message: 'Price verified successfully' })
+  } catch (error) {
+    res.status(404).send('Price not found')
+    throw new Error(error)
+  }
+})
+
+export { getItemPrices, addPrice, addVendor, verifyPrice }

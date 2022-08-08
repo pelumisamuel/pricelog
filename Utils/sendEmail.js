@@ -17,7 +17,7 @@ const transporter = nodemailer.createTransport({
 
 const sendVerificationLink = async (email, id) => {
   try {
-    const url = `http://${
+    const url = `https://${
       process.env.DOMAIN
     }/api/users/confirmation/${emailToken(id)}`
     /**
