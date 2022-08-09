@@ -60,6 +60,11 @@ const addPrice = asyncHandler(async (req, res) => {
     const itemId = req.params.id
     const { price, quantity, vendorId } = req.body
 
+    if (!price) {
+      res.status(403).json({ status: 403, message: 'price needs to be added' })
+      return
+    }
+
     const newPrice = await pool.query(
       'INSERT INTO prices SET price=?,itemId=?, quantity=?, vendorId=?, createdAt=?',
       [price, itemId, quantity, vendorId, date]

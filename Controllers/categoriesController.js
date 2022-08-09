@@ -47,6 +47,11 @@ const addCategoryName = asyncHandler(async (req, res) => {
       'SELECT categoryName FROM categories WHERE categoryName =?',
       [categoryName]
     )
+    if (!categoryName) {
+      res
+        .status(403)
+        .json({ status: 403, message: 'You need to add Name to the category' })
+    }
     if (categoryExist[0].length > 0) {
       return res
         .status(400)

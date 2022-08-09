@@ -93,6 +93,10 @@ const addItem = asyncHandler(async (req, res) => {
   const { name, manufacturer, imgUrl, modelNo, description, categoryID } =
     req.body
   const date = new Date()
+  if (!name || !categoryID) {
+    res.status(400).json('Name or categoryID is needed')
+    return
+  }
   try {
     const newItem = await pool.query(
       'INSERT into items SET name=?, manufacturer=?, modelNo=?, description=?, categoryID=?, image=?, createdAt=?',
