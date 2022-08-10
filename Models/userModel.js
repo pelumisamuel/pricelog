@@ -4,6 +4,11 @@ import pool from '../Config/db.js'
 const getAllUsers = () => {
   return pool.query('SELECT * FROM users')
 }
+const newUsers = () => {
+  return pool.query(
+    'SELECT * FROM users where isEmailVerified and !isVerified and !isDisabled and !isAdmin;'
+  )
+}
 const getOneUser = (email) => {
   return pool.query('SELECT * FROM users WHERE email=?', [email])
 }
@@ -39,6 +44,7 @@ const createAdminAccount = (id) => {
 
 export {
   getAllUsers,
+  newUsers,
   getOneUser,
   getOneUserEmail,
   verifyUserEmail,

@@ -8,7 +8,7 @@ import { getAllItems, getOneItem } from '../Models/itemModel.js'
 const getItems = asyncHandler(async (req, res) => {
   try {
     const pageSize = 10
-    console.log(process.env.DOMAIN)
+
     // get the current Page number from the url i.e GET/api/items?pageNumber=2
     // where pagenumber is the identifier and 2 the value
     const page = Number(req.query.pageNumber) || 1

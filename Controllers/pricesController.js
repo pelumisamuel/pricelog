@@ -10,7 +10,7 @@ const getItemPrices = asyncHandler(async (req, res) => {
     const id = req.params.id
 
     let prices = await pool.query(
-      `SELECT * FROM prices WHERE itemId = ? AND isDeclined = false ORDER BY ?? ${order}`,
+      `SELECT * FROM prices WHERE itemId = ? AND isVerified=true AND isDeclined = false ORDER BY ?? ${order}`,
       [id, keyword]
     )
 
@@ -25,6 +25,12 @@ const getItemPrices = asyncHandler(async (req, res) => {
     res.status(404).send(error)
   }
 })
+
+// const PendingPrice = asyncHandler(async (req, res) => {
+//   try {
+//     let prices = await pool.query()
+//   } catch (error) {}
+// })
 
 const addVendor = asyncHandler(async (req, res) => {
   try {
@@ -56,35 +62,64 @@ const addVendor = asyncHandler(async (req, res) => {
 const addPrice = asyncHandler(async (req, res) => {
   try {
     const date = new Date()
+    const userId = req.user.idusers
 
     const itemId = req.params.id
-    const { price, quantity, vendorId } = req.body
+    // itemId should be added and gotten from the  req.body
+    const {
+      price,
+      quantity,
+      phoneNumber,
+      vendorName,
+      vendorAddress,
+      vendorUrl,
+    } = req.body
 
     if (!price) {
       res.status(403).json({ status: 403, message: 'price needs to be added' })
       return
     }
 
-    const newPrice = await pool.query(
-      'INSERT INTO prices SET price=?,itemId=?, quantity=?, vendorId=?, createdAt=?',
-      [price, itemId, quantity, vendorId, date]
+    await pool.query(
+      'INSERT INTO prices SET price=?, itemId=?, userId=?, quantity=?, phoneNumber=?, vendorName=?, vendorAddress=?, vendorUrl=?, createdAt=?',
+      [
+        price,
+        itemId,
+        userId,
+        quantity,
+        phoneNumber,
+        vendorName,
+        vendorAddress,
+        vendorUrl,
+        date,
+      ]
     )
     res.send({
       status: 201,
       message: 'New Price created Successfully, Please wait for approval',
     })
   } catch (error) {
-    res.status(500).send(error)
+    //sres.status(401).send(error)
+    throw new Error({ status: 401, message: 'One or More Input is Disallowed' })
   }
 })
 
 const verifyPrice = asyncHandler(async (req, res) => {
   try {
     const { priceId } = req.body
-    await pool.query('UPDATE prices set isVerified=? WHERE priceID=?', [
+    const action = req.params.action ? req.params.action : 'isVerified'
+
+    // check filter by a category if it was choosen other was filter using the like
+    // const query = categoryID
+    //   ? 'categoryId=' + categoryID
+    //   : `name LIKE '${keyword}' OR description LIKE '${keyword}'`
+    // console.log(query)
+
+    await pool.query(`UPDATE prices set ${action}=? WHERE priceID=?`, [
       true,
       priceId,
     ])
+
     res
       .status(200)
       .json({ status: 200, message: 'Price verified successfully' })

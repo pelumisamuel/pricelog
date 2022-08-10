@@ -17,11 +17,13 @@ import {
   getOneUser,
   getOneUserById,
   getOneUserEmail,
+  newUsers,
   verifyUserAccount,
   verifyUserEmail,
 } from '../Models/userModel.js'
 
 import { sendVerificationLink } from '../Utils/sendEmail.js'
+import pool from '../Config/db.js'
 
 // const transporter = nodemailer.createTransport({
 //   service: 'gmail',
@@ -202,12 +204,23 @@ const forgotPassword = asyncHandler(async (req, res) => {
 const getUsers = asyncHandler(async (req, res) => {
   try {
     const allUsers = await getAllUsers()
+    const newUsers = await newUsers()
     // console.log(req)
 
     res.status(200).json(allUsers[0])
   } catch (error) {
     throw new Error('something is wrong')
   }
+})
+
+//ADMIN--GET ALL All NEW USERS FOR VERIFICATION
+// 1. From route put api/users/disable/:id
+// 2. Access = Private/Admin
+
+const getNewUsers = asyncHandler(async (req, res) => {
+  try {
+    //const newUsers = await pool.query('SELECT * FROM users where isEmailVerified and !isVerified and !isDisabled and !isAdmin')
+  } catch (error) {}
 })
 
 //ADMIN--VERIFY A USER
