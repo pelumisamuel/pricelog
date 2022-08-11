@@ -109,12 +109,6 @@ const verifyPrice = asyncHandler(async (req, res) => {
     const { priceId } = req.body
     const action = req.params.decline ? 'isDeclined' : 'isVerified'
 
-    // check filter by a category if it was choosen other was filter using the like
-    // const query = categoryID
-    //   ? 'categoryId=' + categoryID
-    //   : `name LIKE '${keyword}' OR description LIKE '${keyword}'`
-    // console.log(query)
-
     await pool.query(`UPDATE prices set ${action}=? WHERE priceID=?`, [
       true,
       priceId,
