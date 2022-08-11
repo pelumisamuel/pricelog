@@ -26,11 +26,17 @@ const getItemPrices = asyncHandler(async (req, res) => {
   }
 })
 
-// const PendingPrice = asyncHandler(async (req, res) => {
-//   try {
-//     let prices = await pool.query()
-//   } catch (error) {}
-// })
+const getPendingPrices = asyncHandler(async (req, res) => {
+  try {
+    let pendingPrices = await pool.query(
+      'SELECT prices.*, users.name, items.name, items.description, items.image FROM prices INNER JOIN users ON users.idusers = prices.userId JOIN items ON prices.itemId = items.itemId WHERE prices.isverified=false AND prices.isDeclined=false ORDER BY createdAt DESC'
+    )
+    res.status(200).send(pendingPrices[0])
+    // ;('SELECT P.*, U.name, I.name, I.description, I.image FROM heroku_a2ed19b42d16203.prices P INNER JOIN heroku_a2ed19b42d16203.users U ON U.idusers = P.userId JOIN heroku_a2ed19b42d16203.items I ON P.itemId =I.itemId WHERE P.isVerified =false AND P.isDeclined = false ORDER BY createdAt DESC;')
+  } catch (error) {
+    throw new Error(error)
+  }
+})
 
 const addVendor = asyncHandler(async (req, res) => {
   try {
@@ -109,12 +115,6 @@ const verifyPrice = asyncHandler(async (req, res) => {
     const { priceId } = req.body
     const action = req.params.decline ? 'isDeclined' : 'isVerified'
 
-    // check filter by a category if it was choosen other was filter using the like
-    // const query = categoryID
-    //   ? 'categoryId=' + categoryID
-    //   : `name LIKE '${keyword}' OR description LIKE '${keyword}'`
-    // console.log(query)
-
     await pool.query(`UPDATE prices set ${action}=? WHERE priceID=?`, [
       true,
       priceId,
@@ -129,4 +129,4 @@ const verifyPrice = asyncHandler(async (req, res) => {
   }
 })
 
-export { getItemPrices, addPrice, addVendor, verifyPrice }
+export { getItemPrices, addPrice, addVendor, verifyPrice, getPendingPrices }
