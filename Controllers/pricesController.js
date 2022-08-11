@@ -1,5 +1,6 @@
 import asyncHandler from 'express-async-handler'
 import pool from '../Config/db.js'
+import { PriceRequests } from '../Models/priceModel.js'
 
 const getItemPrices = asyncHandler(async (req, res) => {
   try {
@@ -28,9 +29,8 @@ const getItemPrices = asyncHandler(async (req, res) => {
 
 const getPendingPrices = asyncHandler(async (req, res) => {
   try {
-    let pendingPrices = await pool.query(
-      'SELECT prices.*, users.name, items.name, items.description, items.image FROM prices INNER JOIN users ON users.idusers = prices.userId JOIN items ON prices.itemId = items.itemId WHERE prices.isverified=false AND prices.isDeclined=false ORDER BY createdAt DESC'
-    )
+    // query from price model
+    let pendingPrices = await PriceRequests()
     res.status(200).send(pendingPrices[0])
     // ;('SELECT P.*, U.name, I.name, I.description, I.image FROM heroku_a2ed19b42d16203.prices P INNER JOIN heroku_a2ed19b42d16203.users U ON U.idusers = P.userId JOIN heroku_a2ed19b42d16203.items I ON P.itemId =I.itemId WHERE P.isVerified =false AND P.isDeclined = false ORDER BY createdAt DESC;')
   } catch (error) {
