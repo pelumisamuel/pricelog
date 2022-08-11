@@ -4,11 +4,14 @@ import {
   addPrice,
   addVendor,
   getItemPrices,
+  getPendingPrices,
   verifyPrice,
 } from '../Controllers/pricesController.js'
 import { admin, protect, verified } from '../Middlewares/authMiddlewares.js'
 
 const router = Router()
+
+router.get('/', protect, verified, admin, getPendingPrices)
 
 router
   .route('/:id')

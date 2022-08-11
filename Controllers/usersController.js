@@ -203,7 +203,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
 
 //GET ALL USERS FROM ADMIN
 
-const getUsers = asyncHandler(async (req, res, next) => {
+const getUsers = asyncHandler(async (req, res) => {
   try {
     const pageSize = 10
     const page = Number(req.query.pageNumber) || 1
