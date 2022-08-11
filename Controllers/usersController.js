@@ -201,7 +201,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
 
 //GET ALL USERS FROM ADMIN
 
-const getUsers = asyncHandler(async (req, res, next) => {
+const getUsers = asyncHandler(async (req, res) => {
   try {
     let newUser = false
 
@@ -221,14 +221,6 @@ const getUsers = asyncHandler(async (req, res, next) => {
     console.log(newUser)
 
     const users = newUser ? await newUsers() : await getAllUsers()
-    // const pageSize = 10
-
-    // // get the current Page number from the url i.e GET/api/items?pageNumber=2
-    // // where pagenumber is the identifier and 2 the value
-    // const page = Number(req.query.pageNumber) || 1
-    // //console.log(req.query.pageNumber, req.query.keyword)
-    // let keyword = req.query.keyword ? '%' + req.query.keyword + '%' : '%'
-    // const categoryID = req.query.category
 
     res.status(200).json(users[0])
   } catch (error) {
