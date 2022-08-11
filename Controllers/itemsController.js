@@ -20,7 +20,6 @@ const getItems = asyncHandler(async (req, res) => {
     const query = categoryID
       ? 'categoryId=' + categoryID
       : `name LIKE '${keyword}' OR description LIKE '${keyword}'`
-    console.log(query)
 
     let countNo = await pool.query(
       `SELECT COUNT(*) FROM items WHERE ${query}`,

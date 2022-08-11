@@ -1,12 +1,23 @@
 // import pool from '../config/db'
 import pool from '../Config/db.js'
 
-const getAllUsers = () => {
-  return pool.query('SELECT * FROM users')
+const getAllUsers = (pageSize, page) => {
+  return pool.query('SELECT * FROM users LIMIT ? OFFSET ?', [
+    pageSize,
+    pageSize * (page - 1),
+  ])
+}
+const countAllUsers = () => {
+  return pool.query(`SELECT COUNT(*) FROM users`)
 }
 const newUsers = () => {
   return pool.query(
     'SELECT * FROM users where isEmailVerified and !isVerified and !isDisabled and !isAdmin;'
+  )
+}
+const countNewUsers = () => {
+  return pool.query(
+    'SELECT COUNT(*) FROM users where isEmailVerified and !isVerified and !isDisabled and !isAdmin'
   )
 }
 const getOneUser = (email) => {
@@ -45,6 +56,8 @@ const createAdminAccount = (id) => {
 export {
   getAllUsers,
   newUsers,
+  countNewUsers,
+  countAllUsers,
   getOneUser,
   getOneUserEmail,
   verifyUserEmail,

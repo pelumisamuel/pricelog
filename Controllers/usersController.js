@@ -11,6 +11,8 @@ import {
 } from '../Utils/validate.js'
 import {
   addOneUser,
+  countAllUsers,
+  countNewUsers,
   createAdminAccount,
   disableUserAccount,
   getAllUsers,
@@ -203,8 +205,11 @@ const forgotPassword = asyncHandler(async (req, res) => {
 
 const getUsers = asyncHandler(async (req, res, next) => {
   try {
+    const pageSize = 10
+    const page = Number(req.query.pageNumber) || 1
     let newUser = false
 
+    // validate newUsers query value
     if (req.query.newUsers) {
       if (req.query.newUsers === 'true') {
         newUser = true
@@ -213,37 +218,25 @@ const getUsers = asyncHandler(async (req, res, next) => {
       } else {
         res.status(401).send({
           status: 401,
-          message: 'new users value should either be true or false',
+          message: 'new users value should either be a true or false',
         })
         return
       }
     }
-    console.log(newUser)
+    let countNo = newUser ? await countNewUsers() : await countAllUsers()
+    countNo = countNo[0][0]
+    // // get the first element of the obj, because count(*); the first name is not selectable
+    const count = countNo[Object.keys(countNo)[0]]
 
-    const users = newUser ? await newUsers() : await getAllUsers()
-    // const pageSize = 10
+    // Get all users  or new Email verified users based on newUser value
+    const users = newUser ? await newUsers() : await getAllUsers(pageSize, page)
 
-    // // get the current Page number from the url i.e GET/api/items?pageNumber=2
-    // // where pagenumber is the identifier and 2 the value
-    // const page = Number(req.query.pageNumber) || 1
-    // //console.log(req.query.pageNumber, req.query.keyword)
-    // let keyword = req.query.keyword ? '%' + req.query.keyword + '%' : '%'
-    // const categoryID = req.query.category
-
-    res.status(200).json(users[0])
+    res
+      .status(200)
+      .json({ users: users[0], page, pages: Math.ceil(count / pageSize) })
   } catch (error) {
     throw new Error(error)
   }
-})
-
-//ADMIN--GET ALL All NEW USERS FOR VERIFICATION
-// 1. From route put api/users/disable/:id
-// 2. Access = Private/Admin
-
-const getNewUsers = asyncHandler(async (req, res) => {
-  try {
-    //const newUsers = await pool.query('SELECT * FROM users where isEmailVerified and !isVerified and !isDisabled and !isAdmin')
-  } catch (error) {}
 })
 
 //ADMIN--VERIFY A USER
