@@ -65,7 +65,7 @@ const addPrice = asyncHandler(async (req, res) => {
     const userId = req.user.idusers
 
     const itemId = req.params.id
-    // itemId should be added and gotten from the  req.body
+    // itemId should be added and gotten from the req.body
     const {
       price,
       quantity,
@@ -99,7 +99,7 @@ const addPrice = asyncHandler(async (req, res) => {
       message: 'New Price created Successfully, Please wait for approval',
     })
   } catch (error) {
-    //sres.status(401).send(error)
+    //res.status(401).send(error)
     throw new Error({ status: 401, message: 'One or More Input is Disallowed' })
   }
 })
@@ -107,7 +107,7 @@ const addPrice = asyncHandler(async (req, res) => {
 const verifyPrice = asyncHandler(async (req, res) => {
   try {
     const { priceId } = req.body
-    const action = req.params.action ? req.params.action : 'isVerified'
+    const action = req.params.decline ? 'isDeclined' : 'isVerified'
 
     // check filter by a category if it was choosen other was filter using the like
     // const query = categoryID

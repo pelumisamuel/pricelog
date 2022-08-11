@@ -201,15 +201,38 @@ const forgotPassword = asyncHandler(async (req, res) => {
 
 //GET ALL USERS FROM ADMIN
 
-const getUsers = asyncHandler(async (req, res) => {
+const getUsers = asyncHandler(async (req, res, next) => {
   try {
-    const allUsers = await getAllUsers()
-    const newUsers = await newUsers()
-    // console.log(req)
+    let newUser = false
 
-    res.status(200).json(allUsers[0])
+    if (req.query.newUsers) {
+      if (req.query.newUsers === 'true') {
+        newUser = true
+      } else if (req.query.newUsers === 'false') {
+        newUser = false
+      } else {
+        res.status(401).send({
+          status: 401,
+          message: 'new users value should either be true or false',
+        })
+        return
+      }
+    }
+    console.log(newUser)
+
+    const users = newUser ? await newUsers() : await getAllUsers()
+    // const pageSize = 10
+
+    // // get the current Page number from the url i.e GET/api/items?pageNumber=2
+    // // where pagenumber is the identifier and 2 the value
+    // const page = Number(req.query.pageNumber) || 1
+    // //console.log(req.query.pageNumber, req.query.keyword)
+    // let keyword = req.query.keyword ? '%' + req.query.keyword + '%' : '%'
+    // const categoryID = req.query.category
+
+    res.status(200).json(users[0])
   } catch (error) {
-    throw new Error('something is wrong')
+    throw new Error(error)
   }
 })
 
