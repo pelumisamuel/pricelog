@@ -12,7 +12,7 @@ const getOneItem = (itemId) => {
   try {
     return pool.query('SELECT * FROM items WHERE itemId=?', [itemId])
   } catch (error) {
-    throw new Error()
+    throw new Error(error)
   }
 }
 

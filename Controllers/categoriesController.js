@@ -40,6 +40,7 @@ const getCategories = asyncHandler(async (req, res) => {
 
 //FOR ADMIN
 // A Controller that create a new category
+//
 const addCategoryName = asyncHandler(async (req, res) => {
   try {
     const { categoryName, categoryDescription } = req.body
