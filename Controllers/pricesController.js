@@ -113,16 +113,36 @@ const addPrice = asyncHandler(async (req, res) => {
 const verifyPrice = asyncHandler(async (req, res) => {
   try {
     const { priceId } = req.body
-    const action = req.params.decline ? 'isDeclined' : 'isVerified'
 
-    await pool.query(`UPDATE prices set ${action}=? WHERE priceID=?`, [
-      true,
-      priceId,
-    ])
+    if (req.query.decline) {
+      if (req.query.decline === 'true') {
+        newUser = true
+      } else if (req.query.decline === 'false') {
+        newUser = false
+      } else {
+        res.status(401).send({
+          status: 401,
+          message: 'decline value should either be a true or false',
+        })
+        return
+      }
+    }
+
+    const action = req.query.decline
+      ? 'isDeclined= true'
+      : 'isVerified=true, isDeclined=false'
+    console.log(req.query)
+
+    await pool.query(`UPDATE prices set ${action} WHERE priceID=?`, [priceId])
 
     res
       .status(200)
-      .json({ status: 200, message: 'Price verified successfully' })
+      .json({
+        status: 200,
+        message: `Price ${
+          req.query.decline ? 'Declined' : 'Verified'
+        } successfully`,
+      })
   } catch (error) {
     res.status(404).send('Price not found')
     throw new Error(error)
