@@ -98,13 +98,14 @@ const registerUser = asyncHandler(async (req, res) => {
   const { error } = validateUsers(req.body)
   if (error) return res.status(400).send({ error: error.details[0].message })
   const { name, email, password } = req.body
+  const date = new Date()
   try {
     const harshedPassword = await hashPassword(password)
     const userExist = await getOneUserEmail(email)
     if (userExist[0].length > 0) {
       res.status(400).send({ status: 400, message: 'User already exist' })
     } else {
-      const result = await addOneUser(name, email, harshedPassword)
+      const result = await addOneUser(name, email, harshedPassword, date)
       await sendVerificationLink(email, result[0].insertId)
       //console.log(result)
 
