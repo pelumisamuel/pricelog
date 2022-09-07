@@ -294,7 +294,7 @@ const disableUser = asyncHandler(async (req, res) => {
 })
 
 //ADMIN--UPGRADE USER TO ADMIN
-// 1. From route put api/users/:id
+// 1. From route put api/users/upgrade/:id
 // 2. Access = Private/Admin
 
 const upgradeUser = asyncHandler(async (req, res) => {
@@ -325,7 +325,7 @@ const upgradeUser = asyncHandler(async (req, res) => {
       .status(200)
       .json({ status: 200, message: 'User has been Upgraded to Admin' })
   } catch (error) {
-    throw new Error()
+    throw new Error(error)
   }
 })
 
