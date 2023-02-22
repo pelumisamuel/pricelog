@@ -1,7 +1,7 @@
 import asyncHandler from 'express-async-handler'
 // import generateToken from '../Utils/generateToken.js'
 
-import { generateToken } from '../Utils/generateToken.js'
+import { generateToken, otpToken } from '../Utils/generateToken.js'
 import jwt from 'jsonwebtoken'
 
 import {
@@ -95,8 +95,11 @@ const LogIn = asyncHandler(async (req, res) => {
 
 // REGISTER USER
 const registerUser = asyncHandler(async (req, res) => {
+  // validate user with joi
   const { error } = validateUsers(req.body)
   if (error) return res.status(400).send({ error: error.details[0].message })
+
+  console.log(otpToken())
   const { name, email, password } = req.body
   const date = new Date()
   try {

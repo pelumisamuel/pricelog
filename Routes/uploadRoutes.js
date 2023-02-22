@@ -13,13 +13,14 @@ const router = Router()
 router.post('/', upload.single('image'), async (req, res) => {
   try {
     const result = await uploads(req.file.path)
-
     //const result = await cloudinary.uploader.upload(req.file.path)
 
-    res.send({ message: 'Image uploaded successfully', link: result.url })
-    //console.log(req.file.path, result)
+    // console.log(req.file.path, result)
+    res
+      .status(201)
+      .send({ message: 'Image uploaded successfully', link: result.url })
   } catch (error) {
-    res.send(error)
+    res.status(500).send(error)
   }
 })
 

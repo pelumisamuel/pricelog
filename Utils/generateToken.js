@@ -11,5 +11,11 @@ const emailToken = (id) => {
     expiresIn: '24h',
   })
 }
+const otpToken = () => {
+  const otp = Math.floor(1000 + Math.random() * 9000)
+  const expiryTime = new Date()
+  expiryTime.setTime(new Date().getTime() + 30 * 60 * 1000)
+  return { otp, expiryTime }
+}
 
-export { generateToken, emailToken }
+export { generateToken, emailToken, otpToken }
